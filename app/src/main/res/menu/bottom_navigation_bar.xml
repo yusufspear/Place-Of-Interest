@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/home"
+        android:title="Home"
+        android:icon="@drawable/ic_home_whik_24dp"
+        android:iconTint="@color/Blue"
+        tools:ignore="HardcodedText"
+        tools:targetApi="o" />
+    <item
+        android:id="@+id/search"
+        android:title="Search"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:iconTint="@color/Yello"
+        tools:ignore="HardcodedText"
+        tools:targetApi="o" />
+    <item
+        android:id="@+id/history"
+        android:title="History"
+        android:iconTint="@color/colorAccent"
+        android:icon="@drawable/ic_history_black_24dp"
+        tools:ignore="HardcodedText"
+        tools:targetApi="o" />
+    <item
+        android:id="@+id/profile"
+        android:title="Profile"
+        android:icon="@drawable/ic_person_outline_black_24dp"
+        android:iconTint="@color/colorPrimaryDark"
+        tools:ignore="HardcodedText"
+        tools:targetApi="o" />
+
+</menu>

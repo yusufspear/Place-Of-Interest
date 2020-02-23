@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Place Of Interest</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="ready_to_code">Ready to Code!</string>
+    <string name="sign_in">Sign in</string>
+    <string name="register">Register</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="login">Login!</string>
+    <string name="forget_password">Forget Password?</string>
+    <string name="gender">Gender:</string>
+    <string name="male">MALE</string>
+    <string name="female">FEMALE</string>
+    <string name="enter_full_name">Enter Full Name</string>
+    <string name="re_enter_password">Re-Enter Password</string>
+    <string name="enter_phone_number">Enter Phone Number</string>
+    <string name="welcome_to">Welcome To</string>
+    <string name="back">Back</string>
+    <string name="select_POI">Select POI</string>
+    <string name="reset_password">RESET Password</string>
+    <string name="enter_the_address">Enter the Address</string>
+    <string name="add_new_places">Add New Places</string>
+    <string name="view_profile">View Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+</resources>

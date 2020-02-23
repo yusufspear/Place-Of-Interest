@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android" tools:ignore="MissingDefaultResource">
+
+
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorWhite"/>
+            <corners android:radius="100dp" />
+            <stroke android:color="@color/BtnBlueLeft" android:width="3dp"/>
+
+        </shape>
+    </item>
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/pureGray"/>
+<!--            <stroke android:color="@color/Gray" android:width="2dp"/>-->
+
+        </shape>
+    </item>
+
+
+
+</selector>
