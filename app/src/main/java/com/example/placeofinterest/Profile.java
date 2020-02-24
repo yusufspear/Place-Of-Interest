@@ -68,7 +68,7 @@ public class Profile extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
 //        FirebaseUser user=mAuth.getCurrentUser();
         String[] New = new String[6];
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+        mStorageRef = FirebaseStorage.getInstance().getReference().child("Profile Image");
         DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("User");
 
         mRef.child(mAuth.getCurrentUser().getUid())
@@ -152,16 +152,39 @@ public class Profile extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_FOR_IMAGEUPLOAD && resultCode == RESULT_OK && data!=null && data.getData()!=null){
             filePath=data.getData();
-
+            Bitmap bitmap = null;
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
-                userphoto.setImageBitmap(bitmap);
-
-
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+//                bitmap.setWidth(100);
+//                bitmap.setHeight(100);
+            userphoto.setImageBitmap(bitmap);
+            if(filePath!=null){
+                String uid=FirebaseAuth.getInstance().getCurrentUser().getUid();
+                StorageReference mStrRef = mStorageRef.child(uid+".jpeg");
+                Log.i("which", "onSuccess: ");
 
+                mStrRef.putFile(filePath)
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Toast.makeText(Profile.this, "Upload Successfully", Toast.LENGTH_SHORT).show();
+                                Log.i("which", "onSuccess: ");
+
+                            }
+                        })
+                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                                Toast.makeText(Profile.this, "Uploading....", Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        });
+
+            }
 
         }
     }
@@ -171,29 +194,7 @@ public class Profile extends AppCompatActivity {
 
     private void EditProfile(View view) {
 
-        if(filePath!=null){
-            Toast.makeText(Profile.this, "Demo", Toast.LENGTH_SHORT).show();
 
-            StorageReference mStrRef = mStorageRef.child("image/"+ UUID.randomUUID().toString());
-            Log.i("OnSucc", "onSuccess: ");
-
-            mStrRef.putFile(filePath)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Toast.makeText(Profile.this, "Working", Toast.LENGTH_SHORT).show();
-                            Log.i("OnSucc", "onSuccess: ");
-
-                        }
-                    })
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-
-                        }
-                    });
-
-        }
     }
 
 

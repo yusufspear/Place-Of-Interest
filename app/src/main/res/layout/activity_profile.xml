@@ -109,7 +109,7 @@
             android:layout_height="33dp"
             android:background="@drawable/profileimage"
             android:padding="4dp"
-            app:srcCompat="@mipmap/baseline_camera_alt_24px" />
+            app:srcCompat="@drawable/ic_photo_camera_black_24dp" />
     </androidx.cardview.widget.CardView>
 
     <Button

@@ -64,6 +64,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,15 +74,15 @@ import static android.graphics.Color.parseColor;
 public class MainActivity extends AppCompatActivity {
 
     private TextInputLayout mEmailLayout, mPasswordLayout;
-    private Button mBtnSignin, mBtnRegisterUser, mBtnSignoutUser;
-    private TextView mOutputText,txtForgetPassword,txtSign_up;
+    private Button mBtnSignin;
+    private TextView txtForgetPassword,txtSign_up;
     private ProgressBar mProgressBar;
     private FirebaseAuth mAuth;
     private DatabaseReference mRef;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private int i;
-    private String isNew;
-    private Boolean isNewBoolean;
+    public Boolean isNewBoolean;
+    public String isNew;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +92,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         mRef = mDatabase.getReference("User");
-//        updateUI();
         initViews();
-
         txtForgetPassword.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
         txtSign_up.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
 
@@ -101,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
         txtSign_up.setOnClickListener(this::signUp);
         txtForgetPassword.setOnClickListener(this::forgetPassword);
         hideProgressBar();
-//
-
 
 
         Dexter.withActivity(this)
@@ -235,37 +232,39 @@ public class MainActivity extends AppCompatActivity {
 
                                 if(Objects.requireNonNull(mAuth.getCurrentUser()).isEmailVerified()){
 
+                                    mRef.child(mAuth.getCurrentUser().getUid()).child("isnew")
+                                            .addValueEventListener(new ValueEventListener() {
 
-                                    mRef.child(mAuth.getCurrentUser().getUid()).child("isnew").addValueEventListener(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            User user =dataSnapshot.getValue(User.class);
+                                                    Log.i("Permission", "On Data Change Field Execute");
+                                                    isNew = dataSnapshot.getValue(String.class);
+                                                    isNewBoolean = Boolean.parseBoolean(isNew);
 
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    Log.i("which", "onDataChange: "+isNew + isNewBoolean);
+                                                    if ( isNewBoolean){
 
-                                            Log.i("Permission","On Data Change Field Execute");
+                                                        startActivity(new Intent(MainActivity.this, POI_Set.class));
+                                                        Toast.makeText(MainActivity.this,"User Log-in Successfully Please Select POI",Toast.LENGTH_LONG).show();
+                                                        Log.i("which1", "onDataChange: "+isNewBoolean + isNew);
 
-                                            isNew = dataSnapshot.getValue(String.class);
-                                            if (isNew.equals("true")){
-                                                startActivity(new Intent(MainActivity.this, POI_Set.class));
-                                                Toast.makeText(MainActivity.this,"User Log-in Successfully Please Select POI",Toast.LENGTH_LONG).show();
-                                                finish();
+                                                    }
+                                                    else{
 
-                                            }else{
-//                                                updateUI();
-                                                startActivity(new Intent(MainActivity.this, Home.class));
-                                                Toast.makeText(MainActivity.this,"User Log-in Successfully",Toast.LENGTH_LONG).show();
+                                                        startActivity(new Intent(MainActivity.this, Home.class));
+                                                        Log.i("which1", "onDataChange: "+isNewBoolean + isNew);
+                                                        Toast.makeText(MainActivity.this,"User Log-in Successfully",Toast.LENGTH_LONG).show();
 
+                                                    }
+                                                }
 
-                                            }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            Log.e("Error", databaseError.getMessage());
-                                        }
-                                    });
-
+                                                    Log.e("Error", databaseError.getMessage());
+                                                }
+                                            });
 
                                 }
 
@@ -276,18 +275,15 @@ public class MainActivity extends AppCompatActivity {
                             }else{
                                 hideProgressBar();
                                 if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+
                                     Toast.makeText(MainActivity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
-                                    mOutputText.setText("Invalid Password");
+
                                 }else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+
                                     Toast.makeText(MainActivity.this,"Email not Exit in Database",Toast.LENGTH_SHORT).show();
-                                    mOutputText.setText("Email NOT Exit");
                                 }
                             }
-
-
                         }
-
-
                     });
 
         }
@@ -300,18 +296,9 @@ public class MainActivity extends AppCompatActivity {
     private void updateUI() {
         FirebaseUser user = mAuth.getCurrentUser();
         hideProgressBar();
-        isNewBoolean = Boolean.valueOf(isNew);
         if (user != null && mAuth.getCurrentUser().isEmailVerified()) {
-            if (!isNewBoolean){
+
                 startActivity(new Intent(this, Home.class));
-
-            }
-
-        }
-
-
-        else{
-            mOutputText.setText("User NOT Log-in");
 
         }
 
@@ -369,7 +356,6 @@ public class MainActivity extends AppCompatActivity {
         mEmailLayout = findViewById(R.id.et_email);
         mPasswordLayout = findViewById(R.id.et_password);
         mBtnSignin = findViewById(R.id.btn_singin);
-        mOutputText = findViewById(R.id.tv_output);
         mProgressBar = findViewById(R.id.progressbar);
         txtSign_up = findViewById(R.id.txtsign_up);
         txtForgetPassword = findViewById(R.id.txtforget);
