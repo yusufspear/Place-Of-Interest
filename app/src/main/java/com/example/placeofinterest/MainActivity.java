@@ -33,6 +33,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputBinding;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -74,7 +75,7 @@ import static android.graphics.Color.parseColor;
 public class MainActivity extends AppCompatActivity {
 
     private TextInputLayout mEmailLayout, mPasswordLayout;
-    private Button mBtnSignin;
+    private Button mBtnSignin,POI;
     private TextView txtForgetPassword,txtSign_up;
     private ProgressBar mProgressBar;
     private FirebaseAuth mAuth;
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         txtForgetPassword.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
         txtSign_up.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
-
+        POI.setOnClickListener(this::Click);
         mBtnSignin.setOnClickListener(this::singInUser);
         txtSign_up.setOnClickListener(this::signUp);
         txtForgetPassword.setOnClickListener(this::forgetPassword);
@@ -177,6 +178,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     private void forgetPassword(View view) {
         startActivity(new Intent(this, ForgetPassword.class));
         finish();
@@ -245,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                                                     Log.i("which", "onDataChange: "+isNew + isNewBoolean);
                                                     if ( isNewBoolean){
 
-                                                        startActivity(new Intent(MainActivity.this, POI_Set.class));
+                                                        startActivity(new Intent(MainActivity.this, Select_POI.class));
                                                         Toast.makeText(MainActivity.this,"User Log-in Successfully Please Select POI",Toast.LENGTH_LONG).show();
                                                         Log.i("which1", "onDataChange: "+isNewBoolean + isNew);
 
@@ -359,6 +362,8 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar = findViewById(R.id.progressbar);
         txtSign_up = findViewById(R.id.txtsign_up);
         txtForgetPassword = findViewById(R.id.txtforget);
+        POI = findViewById(R.id.btn_poi);
+
 
     }
 
@@ -405,6 +410,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
         mAuth.addAuthStateListener(mAuthStateListener);
+    }
+    private void Click(View view) {
+        startActivity(new Intent(this,MapsActivity2.class));
+        finish();
     }
 
     @Override

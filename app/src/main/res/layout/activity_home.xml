@@ -6,18 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".Home">
 
-    <FrameLayout
-        android:id="@+id/map_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_above="@id/bottom_navigation_bar"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
     <!--    <SearchView-->
     <!--        android:id="@+id/search_View"-->
     <!--        android:layout_width="0dp"-->
@@ -32,69 +20,156 @@
     <!--        app:layout_constraintEnd_toEndOf="parent"-->
     <!--        app:layout_constraintStart_toStartOf="parent"-->
     <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-    <fragment
-        android:id="@+id/place_autocomplete_fragment"
-        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="10dp"
+    <FrameLayout
+        android:id="@+id/map_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_above="@id/bottom_navigation_bar"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_bar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_place_autocomplete_fragment"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:elevation="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@+id/map_fragment"
+        app:layout_constraintStart_toStartOf="@+id/map_fragment"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="10"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:layout_weight="4.4"
+                android:foreground="@drawable/ic_menu_animated"
+                android:foregroundGravity="center"
+                android:foregroundTint="@color/colorBlack"
+                tools:ignore="ContentDescription,UnusedAttribute" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_weight="4.98"
+                android:background="@color/Gray"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:layout_height="match_parent" />
+
+            <fragment
+                android:id="@+id/place_autocomplete_fragment"
+                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                tools:layout="@layout/places_autocomplete_impl_fragment_overlay"
+                tools:layout_editor_absoluteX="10dp"
+                tools:layout_editor_absoluteY="16dp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <!--    <com.mancj.materialsearchbar.MaterialSearchBar-->
+    <!--        android:id="@+id/searchBar"-->
+    <!--        style="@style/MaterialSearchBarLight"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="16dp"-->
+    <!--        android:elevation="5dp"-->
+    <!--        android:outlineProvider="bounds"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/linearLayout"-->
+    <!--        app:mt_hint="Search a place"-->
+    <!--        app:mt_maxSuggestionsCount="10"-->
+    <!--        app:mt_navIconEnabled="true"-->
+    <!--        app:mt_placeholder="Search a place"-->
+    <!--        app:mt_speechMode="false" />-->
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:padding="2sp"
-        android:layout_marginTop="5dp"
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:padding="2dp"
         android:orientation="horizontal"
+        android:scrollbars="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:scrollbars="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/place_autocomplete_fragment">
+        app:layout_constraintTop_toBottomOf="@+id/cardView_place_autocomplete_fragment">
 
         <Button
             android:id="@+id/restaurant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Restaurants"
-            android:textSize="12sp"
             style="?android:attr/buttonBarButtonStyle"
-            android:padding="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_gravity="start"
+            android:background="@drawable/nearbyplace_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:onClick="onClick"
+            android:text="Restaurants"
             android:textColor="@color/colorBlack"
-            android:background="@drawable/searchfield"
+            android:textSize="12sp"
             tools:ignore="HardcodedText" />
+
         <Button
             android:id="@+id/hotel"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hotels"
-            android:textSize="12sp"
+            android:layout_height="35dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/nearbyplace_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            style="?android:attr/buttonBarButtonStyle"             android:padding="5dp"
+            android:onClick="onClick"
+            android:text="Hotels"
             android:textColor="@color/colorBlack"
-            android:background="@drawable/searchfield"
+            android:textSize="12sp"
             tools:ignore="HardcodedText" />
+
         <Button
             android:id="@+id/atm"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ATM"
+            android:layout_height="35dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/nearbyplace_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:textSize="12sp"
-            style="?android:attr/buttonBarButtonStyle"
-            android:padding="5dp"
+            android:onClick="onClick"
+            android:text="ATM"
             android:textColor="@color/colorBlack"
-            android:background="@drawable/searchfield"
+            android:textSize="12sp"
+            tools:ignore="HardcodedText" />
+        <Button
+            android:id="@+id/school"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/nearbyplace_background"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:onClick="onClick"
+            android:text="School"
+            android:textColor="@color/colorBlack"
+            android:textSize="12sp"
             tools:ignore="HardcodedText" />
 
     </LinearLayout>
@@ -150,7 +225,7 @@
         app:layout_constraintEnd_toEndOf="@+id/map_fragment"
         app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="@+id/map_fragment"
-        app:rippleColor="@color/Yello"
+        app:rippleColor="@color/Yellow"
         tools:ignore="UnusedAttribute,VectorDrawableCompat"
         tools:targetApi="m" />
 

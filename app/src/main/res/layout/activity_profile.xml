@@ -61,7 +61,7 @@
         android:elevation="15dp"
         android:gravity="center"
         app:itemIconTint="@color/Blue"
-        app:itemTextColor="@color/Yello"
+        app:itemTextColor="@color/Yellow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.444"

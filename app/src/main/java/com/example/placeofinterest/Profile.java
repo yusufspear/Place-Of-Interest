@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.model.GlideUrl;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -40,6 +43,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+import com.theartofdev.edmodo.cropper.CropImageView.CropShape;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,6 +60,8 @@ public class Profile extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private Uri filePath;
     private StorageReference mStorageRef;
+    private DatabaseReference mDataRef;
+    private FirebaseUser user;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     @Override
@@ -72,23 +78,17 @@ public class Profile extends AppCompatActivity {
         viewInstant.setOnClickListener(this::ViewInstantProfile);
         addNewPlace.setOnClickListener(this::UpdattePOI);
         uploadImageButton.setOnClickListener(this::UploadImage);
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         mAuth=FirebaseAuth.getInstance();
-        FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+        user=FirebaseAuth.getInstance().getCurrentUser();
         String[] New = new String[6];
-        mStorageRef = FirebaseStorage.getInstance().getReference().child("Profile Image");
-        DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("User");
-                if (user!=null){
-            Log.i("which", "User NOT NULL ");
-            if (user.getPhotoUrl()!=null){
-                Log.i("which", "PhotoUrl was there: ");
-                Glide.with(Profile.this)
-                        .load(user.getPhotoUrl())
-                        .into(userphoto);
-            }
+        mStorageRef = FirebaseStorage.getInstance().getReference().child("Profile Image").child(uid);
+        mDataRef = FirebaseDatabase.getInstance().getReference("User");
 
-        }
-        mRef.child(mAuth.getCurrentUser().getUid())
+
+        checkProfileImage(user);
+        mDataRef.child(mAuth.getCurrentUser().getUid())
                 .addValueEventListener(new ValueEventListener() {
 
             @Override
@@ -144,87 +144,94 @@ public class Profile extends AppCompatActivity {
 
     }
 
+    private void checkProfileImage(FirebaseUser user) {
+        if (user!=null){
+            Log.i("which", "User NOT NULL ");
+            if (user.getPhotoUrl()!=null){
+                Log.i("which", "PhotoUrl was there: "+user.getPhotoUrl());
+                Glide.with(Profile.this)
+                        .load(user.getPhotoUrl())
+                        .into(userphoto);
+            }
+//                else {
+//                    userphoto.setImageResource(R.drawable.ic_account_circle_black_24dp);
+//                }
+
+        }
+    }
+
     private void UploadImage(View view) {
         Intent intent=new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Please Select Your Picture"),REQUEST_CODE_FOR_IMAGEUPLOAD);
-
-
-    }
-
-    private void UpdattePOI(View view) {
+        startActivityForResult(Intent.createChooser(intent,"SELECT PROFILE PICTURE"),REQUEST_CODE_FOR_IMAGEUPLOAD);
 
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-//        if(requestCode==REQUEST_CODE_FOR_IMAGEUPLOAD && resultCode==RESULT_OK && data!=null) {
-//            Uri uri = data.getData();
-//            CropImage.activity()
-//                    .setGuidelines(CropImageView.Guidelines.ON)
-//                    .setAspectRatio(1,1)
-//                    .setAllowRotation(true)
-//                    .start(this);
-//        }
+
         if (requestCode == REQUEST_CODE_FOR_IMAGEUPLOAD && resultCode == RESULT_OK && data!=null && data.getData()!=null){
             filePath=data.getData();
-            Bitmap bitmap = null;
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
-                handleUpload(bitmap);
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setCropShape(CropShape.OVAL)
+                    .setAspectRatio(2,2)
+                    .start(this);
+        }
+        if (requestCode==CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
 
+            CropImage.ActivityResult result= CropImage.getActivityResult(data);
+            if (resultCode==RESULT_OK){
+                Bitmap bitmap = null;
+                Uri resultUri = result.getUri();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),resultUri);
+                userphoto.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//                bitmap.setWidth(100);
-//                bitmap.setHeight(100);
-            userphoto.setImageBitmap(bitmap);
-            if(filePath!=null){
-                String uid=FirebaseAuth.getInstance().getCurrentUser().getUid();
-                StorageReference mStrRef = mStorageRef.child(uid+".jpeg");
-                Log.i("which", "onSuccess: ");
-
-                mStrRef.putFile(filePath)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Toast.makeText(Profile.this, "Upload Successfully", Toast.LENGTH_SHORT).show();
-                                Log.i("which", "onSuccess: ");
-//                                getDownloadUrl(mStrRef);
-
-                            }
-                        })
-                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                                Toast.makeText(Profile.this, "Uploading....", Toast.LENGTH_SHORT).show();
-
-
-                            }
-                        });
-
+            if(resultUri!=null){
+                handleUpload(bitmap);
+            }
             }
         }
+
+
+//        if (requestCode == REQUEST_CODE_FOR_IMAGEUPLOAD && resultCode == RESULT_OK && data!=null && data.getData()!=null){
+//            filePath=data.getData();
+//
+//            Bitmap bitmap = null;
+//            try {
+//                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            if(filePath!=null){
+//                handleUpload(bitmap);
+//            }
+//        }
     }
     private void handleUpload(Bitmap bitmap) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos);
 
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        final StorageReference reference = FirebaseStorage.getInstance().getReference()
-                .child("profileImages")
-                .child(uid + ".jpeg");
-
-        reference.putBytes(baos.toByteArray())
+        StorageReference mStrRef = mStorageRef.child("ProfileImage.jpeg");
+        mStrRef.putBytes(baos.toByteArray())
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        getDownloadUrl(reference);
+                        getDownloadUrl(mStrRef);
+                        Toast.makeText(Profile.this, "Updating...",Toast.LENGTH_LONG).show();
+                        userphoto.setImageBitmap(bitmap);
                     }
                 })
+
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -233,14 +240,7 @@ public class Profile extends AppCompatActivity {
                 });
     }
 
-//    private void getDownloadUrl(StorageReference mStrRef) {
-//        mStrRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//            @Override
-//            public void onSuccess(Uri uri) {
-//                setUserProfileUrl(uri);
-//            }
-//        });
-//    }
+
 private void getDownloadUrl(StorageReference reference) {
     reference.getDownloadUrl()
             .addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -252,54 +252,37 @@ private void getDownloadUrl(StorageReference reference) {
             });
 }
 
-//    private void setUserProfileUrl(Uri uri) {
-//
-//        FirebaseUser user =FirebaseAuth.getInstance().getCurrentUser();
-//        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
-//                .setPhotoUri(uri)
-//                .build();
-//
-//        user.updateProfile(request)
-//                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        Toast.makeText(Profile.this, "Profile Update Successfully", Toast.LENGTH_SHORT).show();
-//
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//
-//                    }
-//                });
-//    }
-private void setUserProfileUrl(Uri uri) {
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-    UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
-            .setPhotoUri(uri)
-            .build();
+    private void setUserProfileUrl(Uri uri) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                .setPhotoUri(uri)
+                .build();
 
-    user.updateProfile(request)
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Toast.makeText(Profile.this, "Updated succesfully", Toast.LENGTH_SHORT).show();
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(Profile.this, "Profile image failed...", Toast.LENGTH_SHORT).show();
-                }
-            });
-}
-    private void ViewInstantProfile(View view) {
+        user.updateProfile(request)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        mDataRef.child(mAuth.getCurrentUser().getUid()).child("photoUrl:").setValue(user.getPhotoUrl().toString());
+                        Toast.makeText(Profile.this, "Update successfully", Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(Profile.this, "Update Failed..."+e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
+    private void UpdattePOI(View view) {
 
+    }
+    private void ViewInstantProfile(View view) {
+
+    }
     private void EditProfile(View view) {
-
 
     }
 
@@ -307,8 +290,6 @@ private void setUserProfileUrl(Uri uri) {
     private void signOutUser(View view){
             mAuth.signOut();
             startActivity(new Intent(this,MainActivity.class));
-            //updateUI();
-
         }
 
     private void initViews() {
@@ -321,8 +302,6 @@ private void setUserProfileUrl(Uri uri) {
         editProfile =findViewById(R.id.edit_profile);
         userphoto = findViewById(R.id.userImage);
         uploadImageButton =findViewById(R.id.uploadImage);
-
-//        FragmentHome = findViewById(R.id.fragment_home);
 
     }
 

@@ -26,4 +26,18 @@
     <string name="add_new_places">Add New Places</string>
     <string name="view_profile">View Profile</string>
     <string name="edit_profile">Edit Profile</string>
+    <string name="gym">Gym</string>
+    <string name="button">Button</string>
+    <string name="restaurant">Restaurant</string>
+    <string name="hotel">Hotel</string>
+    <string name="park">Park</string>
+    <string name="mall">Mall</string>
+    <string name="cinema">Cinema</string>
+    <string name="music_venues">Music Venues</string>
+    <string name="place_of_interest">Place Of Interest</string>
+    <string name="point_of_interest">Point Of Interest</string>
+    <string name="hospitals">Hospitals</string>
+    <string name="banks">Banks</string>
+    <string name="schools">Schools</string>
+    <string name="search">Search</string>
 </resources>

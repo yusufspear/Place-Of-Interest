@@ -1,0 +1,4 @@
+<resources>
+	<dimen name="poi_width">166.9dp</dimen>
+	<dimen name="poi_height">128.4dp</dimen>
+</resources>
