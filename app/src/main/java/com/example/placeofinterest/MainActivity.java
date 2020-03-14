@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         txtForgetPassword.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
         txtSign_up.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
-        POI.setOnClickListener(this::Click);
         mBtnSignin.setOnClickListener(this::singInUser);
         txtSign_up.setOnClickListener(this::signUp);
         txtForgetPassword.setOnClickListener(this::forgetPassword);
@@ -177,8 +176,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
 
     private void forgetPassword(View view) {
         startActivity(new Intent(this, ForgetPassword.class));
@@ -410,10 +407,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
         mAuth.addAuthStateListener(mAuthStateListener);
-    }
-    private void Click(View view) {
-        startActivity(new Intent(this,MapsActivity2.class));
-        finish();
     }
 
     @Override

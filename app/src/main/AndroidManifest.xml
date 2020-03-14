@@ -62,13 +62,6 @@
 
         </activity>
 
-        <activity
-            android:name=".MapsActivity2"
-            android:label="@string/title_activity_maps"
-            android:screenOrientation="fullSensor">
-
-        </activity>
-
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />

@@ -83,6 +83,13 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.io.IOException;
@@ -120,20 +127,31 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 
     private MaterialSearchBar materialSearchBar;
     private List<AutocompletePrediction> predictionList;
-    private double CurrentLocation_Lat;
-    private double CurrentLocation_Long;
+    private static double CurrentLocation_Lat= 0.0;
+    private static double CurrentLocation_Long=0.0;
     private Context mContext;
 
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDataRef;
+    private FirebaseUser user;
+
+    public Home() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate: CALLED");
         doorView  = getWindow().getDecorView();
 //        d.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.TYPE_STATUS_BAR);
 //        d.setFlags(WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION,WindowManager.LayoutParams.TYPE_STATUS_BAR);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             doorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
         }
+
+        mAuth=FirebaseAuth.getInstance();
+        user=FirebaseAuth.getInstance().getCurrentUser();
+        mDataRef = FirebaseDatabase.getInstance().getReference("User");
 
         setContentView(R.layout.activity_home);
         GoogleMapOptions options= new GoogleMapOptions()
@@ -343,6 +361,42 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 
     }
 
+    private void isCurrentLocation() {
+
+        mDataRef.child(user.getUid()).child("Location").child("lastLocation")
+                .addValueEventListener(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                        CurrentLocation_Lat =dataSnapshot.child("Latitude").getValue(Double.class);
+                        CurrentLocation_Long =dataSnapshot.child("Longitude").getValue(Double.class);
+
+                        Log.i("List", "onDataChange: Execute");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+//    @Override
+//    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+//        savedInstanceState.putDouble("lat", CurrentLocation_Lat);
+//        savedInstanceState.putDouble("long", CurrentLocation_Long);
+//        super.onSaveInstanceState(savedInstanceState);
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        CurrentLocation_Lat=savedInstanceState.getDouble("lat");
+//        CurrentLocation_Long=savedInstanceState.getDouble("long");
+//    }
+
 
     private String getUrl(double latitude , double longitude , String nearbyPlace){
 
@@ -357,7 +411,6 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
         return googlePlaceUrl.toString();
     }
     private void CurrentLocation(View view) {
-
 
         if (isGPSEnabled()){
 
@@ -498,17 +551,19 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setBuildingsEnabled(true);
+
         mMap.setInfoWindowAdapter(new CustomInfoWindow_Adapter(Home.this));
         LatLng latLng=new LatLng(CurrentLocation_Lat, CurrentLocation_Long);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,18));
+        Log.i(TAG, "onMapReady: "+CurrentLocation_Lat+CurrentLocation_Long);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,19));
 
     }
 
     private void LocationUpdate(){
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(1500);
-        locationRequest.setFastestInterval(500);
+        locationRequest.setInterval(1000);
+        locationRequest.setFastestInterval(700);
 
         handlerThread = new HandlerThread("LocationCallbackHandler");
         handlerThread.start();
@@ -694,29 +749,49 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.i(TAG, "onPause: ");
 
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Log.i(TAG, "onStop: ");
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i(TAG, "onResume: ");
+        if (CurrentLocation_Lat!=0){
+
+            Log.i(TAG, "onResume: IF Excuted " +CurrentLocation_Lat+CurrentLocation_Long);
+            mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Latitude").setValue(CurrentLocation_Lat);
+            mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Longitude").setValue(CurrentLocation_Long);
+            isCurrentLocation();
+        }
+
 
     }
+
+
 
     @Override
     protected void onRestart() {
         super.onRestart();
+        Log.i(TAG, "onRestart: ");
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.i(TAG, "onDestroy: ");
+        mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Latitude").setValue(CurrentLocation_Lat);
+        mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Longitude").setValue(CurrentLocation_Long);
+
         if (handlerThread!=null){
             handlerThread.quitSafely();
         }
