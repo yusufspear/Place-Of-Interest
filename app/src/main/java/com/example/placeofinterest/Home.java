@@ -215,11 +215,9 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 
             }
 
-
-
             @Override
             public void onError(@NonNull Status status) {
-                Log.i(TAG, "An error occurred: " + status);
+                Log.i(TAG, "An error occurred: " + status.getStatusMessage());
 
             }
         });
@@ -430,13 +428,10 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
                         mMap.animateCamera(cameraUpdate, 1000, new GoogleMap.CancelableCallback() {
                             @Override
                             public void onFinish() {
-//                        Toast.makeText(Home.this, "Finished", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onCancel() {
-//                        Toast.makeText(Home.this, "Cancelled", Toast.LENGTH_SHORT).show();
-
                             }
                         });
 
@@ -456,14 +451,18 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
         if (providerEnable){
             return true;
         }else {
-            Context context;
             AlertDialog alertDialog = new AlertDialog.Builder(this)
                     .setTitle("GPS Permission")
                     .setMessage("It is Required For Finding Current Location of the Device")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes",(dialogInterface, i) -> {
+                    .setCancelable(true)
+                    .setPositiveButton("YES",(dialogInterface, i) -> {
                         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivityForResult(intent,GPS_REQUEST_CODE);
+                    })
+                    .setNegativeButton("NO",(dialogInterface, i) -> {
+                        LatLng latLng=new LatLng(CurrentLocation_Lat, CurrentLocation_Long);
+                        Log.i(TAG, "onMapReady: "+CurrentLocation_Lat+CurrentLocation_Long);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,19));
                     })
                     .show();
             return false;
