@@ -19,22 +19,19 @@
 <!--        app:layout_constraintTop_toTopOf="parent"-->
 <!--        app:layout_constraintVertical_bias="1.0"/>-->
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation_bar"
+    <com.ismaeldivita.chipnavigation.ChipNavigationBar
+        android:id="@+id/chip_navigation_bar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_margin="0dp"
-        android:elevation="15dp"
-        android:gravity="center"
-        app:itemIconTint="@color/Blue"
-        app:itemTextColor="@color/BtnBlueLeft"
+        android:layout_height="50dp"
+        android:padding="1.5dp"
         android:background="@color/colorWhite"
+        app:cnb_menuResource="@menu/chip_bottom_nav_bar"
+        app:cnb_orientationMode="horizontal"
+        app:cnb_unselectedColor="@color/colorBlack"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.444"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_navigation_bar">
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

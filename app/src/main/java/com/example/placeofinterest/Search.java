@@ -8,10 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -64,7 +60,7 @@ public class Search extends AppCompatActivity {
 
     private void initViews() {
 
-        bottomNavigationView=findViewById(R.id.bottom_navigation_bar);
+        bottomNavigationView=findViewById(R.id.chip_navigation_bar);
 //        FragmentHome = findViewById(R.id.fragment_home);
 
     }

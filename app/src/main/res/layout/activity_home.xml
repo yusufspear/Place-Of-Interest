@@ -20,17 +20,19 @@
     <!--        app:layout_constraintEnd_toEndOf="parent"-->
     <!--        app:layout_constraintStart_toStartOf="parent"-->
     <!--        app:layout_constraintTop_toTopOf="parent" />-->
+
     <FrameLayout
         android:id="@+id/map_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_above="@id/bottom_navigation_bar"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_bar"
+        android:layout_above="@id/chip_navigation_bar"
+        app:layout_constraintBottom_toTopOf="@+id/chip_navigation_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent">
+
+    </FrameLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView_place_autocomplete_fragment"
@@ -46,15 +48,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:weightSum="10"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="10">
 
             <ImageButton
                 android:id="@+id/imageButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/colorWhite"
                 android:layout_weight="4.4"
+                android:background="@color/colorWhite"
                 android:foreground="@drawable/ic_menu_animated"
                 android:foregroundGravity="center"
                 android:foregroundTint="@color/colorBlack"
@@ -62,12 +64,12 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_weight="4.98"
-                android:background="@color/Gray"
-                android:layout_marginTop="10dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:layout_height="match_parent" />
+                android:layout_weight="4.98"
+                android:background="@color/Gray" />
 
             <fragment
                 android:id="@+id/place_autocomplete_fragment"
@@ -106,8 +108,8 @@
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
-        android:padding="2dp"
         android:orientation="horizontal"
+        android:padding="2dp"
         android:scrollbars="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -119,9 +121,9 @@
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_gravity="start"
-            android:background="@drawable/nearbyplace_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:background="@drawable/nearbyplace_background"
             android:onClick="onClick"
             android:text="Restaurants"
             android:textColor="@color/colorBlack"
@@ -134,9 +136,9 @@
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_gravity="center_horizontal"
-            android:background="@drawable/nearbyplace_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:background="@drawable/nearbyplace_background"
             android:onClick="onClick"
             android:text="Hotels"
             android:textColor="@color/colorBlack"
@@ -149,23 +151,24 @@
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_gravity="center_horizontal"
-            android:background="@drawable/nearbyplace_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:background="@drawable/nearbyplace_background"
             android:onClick="onClick"
             android:text="ATM"
             android:textColor="@color/colorBlack"
             android:textSize="12sp"
             tools:ignore="HardcodedText" />
+
         <Button
             android:id="@+id/school"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_gravity="center_horizontal"
-            android:background="@drawable/nearbyplace_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:background="@drawable/nearbyplace_background"
             android:onClick="onClick"
             android:text="School"
             android:textColor="@color/colorBlack"
@@ -185,8 +188,9 @@
         android:focusable="true"
         android:foreground="@drawable/ic_my_location_black_24dp"
         android:foregroundGravity="center"
+
         app:borderWidth="0dp"
-        app:elevation="12dp"
+        app:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/map_fragment"
         app:layout_constraintEnd_toEndOf="@+id/map_fragment"
         app:layout_constraintHorizontal_bias="0.8"
@@ -217,33 +221,33 @@
         android:focusable="true"
         android:foreground="@drawable/ic_directions_black_24dp"
         android:foregroundGravity="center"
-        app:backgroundTint="@color/Blue"
-        app:borderWidth="1dp"
+        app:borderWidth="0dp"
         app:elevation="8dp"
         app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="@+id/map_fragment"
         app:layout_constraintEnd_toEndOf="@+id/map_fragment"
         app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="@+id/map_fragment"
-        app:rippleColor="@color/Yellow"
+        app:rippleColor="@color/Green"
         tools:ignore="UnusedAttribute,VectorDrawableCompat"
         tools:targetApi="m" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation_bar"
+
+    <com.ismaeldivita.chipnavigation.ChipNavigationBar
+        android:id="@+id/chip_navigation_bar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_margin="0dp"
-        android:background="@color/colorWhite"
-        android:elevation="15dp"
-        android:gravity="center"
-        app:itemIconTint="@color/Blue"
+        android:layout_height="50dp"
+        android:background="@drawable/bottom_nav_bar_background"
+        android:gravity="center_horizontal"
+        android:padding="1.5dp"
+        app:cnb_menuResource="@menu/chip_bottom_nav_bar"
+        app:cnb_orientationMode="horizontal"
+
+        app:cnb_unselectedColor="@color/colorBlack"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.444"
+        app:layout_constraintLeft_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_navigation_bar">
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        app:layout_constraintTop_toBottomOf="@+id/map_fragment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

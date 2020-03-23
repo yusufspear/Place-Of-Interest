@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/chip_home"
+        android:title="Home"
+        android:icon="@drawable/ic_home_black_24dp"
+        app:cnb_iconColor="@color/white"
+        app:cnb_textColor="@color/white"
+        app:cnb_backgroundColor="@color/Red"
+        tools:ignore="HardcodedText" />
+
+    <item
+        android:id="@+id/chip_history"
+        android:title="History"
+        android:icon="@drawable/ic_history_black_24dp"
+        app:cnb_iconColor="@color/white"
+        app:cnb_textColor="@color/white"
+        app:cnb_backgroundColor="@color/Blue"
+        tools:ignore="HardcodedText" />
+
+    <item
+        android:id="@+id/chip_profile"
+        android:title="Profile"
+        android:icon="@drawable/ic_person_outline_black_24dp"
+        app:cnb_iconColor="@color/white"
+        app:cnb_textColor="@color/white"
+        app:cnb_backgroundColor="@color/Green"
+        tools:ignore="HardcodedText" />
+
+</menu>

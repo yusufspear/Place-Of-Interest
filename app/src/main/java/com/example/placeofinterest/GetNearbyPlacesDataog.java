@@ -1,7 +1,6 @@
 package com.example.placeofinterest;
 
 import android.content.Context;
-
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -15,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
+public class GetNearbyPlacesDataog extends AsyncTask<Object, String, String> {
 
     private static final String TAG ="TAG";
 
@@ -29,7 +28,7 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
 
     private Context context;
 
-    public GetNearbyPlacesData(Context context) {
+    public GetNearbyPlacesDataog(Context context) {
         this.context = context;
     }
 

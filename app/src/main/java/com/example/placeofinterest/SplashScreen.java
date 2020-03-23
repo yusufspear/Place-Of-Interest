@@ -34,7 +34,7 @@ public class SplashScreen extends AppCompatActivity {
         card_logo.setAnimation(topAnim);
         txt_logo.setAnimation(bottomAnim);
 
-        int SPLASH_SCREEN = 1500;
+        int SPLASH_SCREEN = 800;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

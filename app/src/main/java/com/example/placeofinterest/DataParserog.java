@@ -1,16 +1,17 @@
 package com.example.placeofinterest;
 
 
-import java.util.HashMap;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-class DataParser {
+class DataParserog {
 
     private HashMap<String, String> getPlace(JSONObject googlePlaceJson)
     {

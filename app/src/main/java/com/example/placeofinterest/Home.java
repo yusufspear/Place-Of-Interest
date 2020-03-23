@@ -3,52 +3,29 @@ package com.example.placeofinterest;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.hardware.camera2.CameraManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.provider.Settings;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
+import android.view.ActionMode;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -68,16 +45,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -90,19 +59,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.mancj.materialsearchbar.MaterialSearchBar;
+import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
-import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import static android.widget.Toast.LENGTH_LONG;
+import static com.example.placeofinterest.R.id.chip_home;
 
 
-public class Home extends AppCompatActivity implements OnMapReadyCallback {
+public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final double Lat= 19.077806;
     private static final double Long= 72.883056;
@@ -117,6 +86,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
     //    SearchView searchView;
     private static String TAG="TAG";
     BottomNavigationView bottomNavigationView;
+    ChipNavigationBar chipNavigationBar;
     private FusedLocationProviderClient mLocationClient;
     private LocationCallback mLocationCallback;
     HandlerThread handlerThread;
@@ -125,33 +95,34 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
     private Location deviceCurrentLocation;
     private SupportMapFragment supportMapFragment;
 
-    private MaterialSearchBar materialSearchBar;
-    private List<AutocompletePrediction> predictionList;
-    private static double CurrentLocation_Lat= 0.0;
-    private static double CurrentLocation_Long=0.0;
+    private static double CurrentLocation_Lat;
+    private static double CurrentLocation_Long;
     private Context mContext;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDataRef;
     private FirebaseUser user;
 
-    public Home() {
-    }
+    public ArrayList list_Lat = new ArrayList<Double>();
+    public ArrayList list_Long = new ArrayList<Double>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate: CALLED");
-        doorView  = getWindow().getDecorView();
-//        d.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.TYPE_STATUS_BAR);
-//        d.setFlags(WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION,WindowManager.LayoutParams.TYPE_STATUS_BAR);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            doorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-        }
-
+//        doorView  = getWindow().getDecorView();
+////        d.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.TYPE_STATUS_BAR);
+////        d.setFlags(WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION,WindowManager.LayoutParams.TYPE_STATUS_BAR);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            doorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+//        }
+        hideSystemUI();
         mAuth=FirebaseAuth.getInstance();
         user=FirebaseAuth.getInstance().getCurrentUser();
         mDataRef = FirebaseDatabase.getInstance().getReference("User");
+        isCurrentLocation();
 
         setContentView(R.layout.activity_home);
         GoogleMapOptions options= new GoogleMapOptions()
@@ -197,8 +168,14 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 
                         LatLng address = place.getLatLng();
                         mMap.animateCamera(CameraUpdateFactory.zoomTo(4.0f));
-                        Marker marker =mMap.addMarker(new MarkerOptions().position(address).draggable(true).title(place.getName())
-                                .snippet(  "ADDRESS:  "+place.getAddress() +"\nRATING: "+place.getRating()+"\nCONTACT: "+place.getPhoneNumber()));
+                        Marker marker = null;
+                        try {
+                            marker = mMap.addMarker(new MarkerOptions().position(address).draggable(true).title(place.getName())
+                                    .snippet(  "ADDRESS:  "+place.getAddress() +"\nRATING: "+place.getRating()+" ("+place.getUserRatingsTotal()+" )"
+                                            +"\nCONTACT: "+place.getPhoneNumber()+"\nWEBSITE: "+new URL(place.getWebsiteUri().toString())));
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        }
                         marker.hideInfoWindow();
                         CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(address,18);
                         mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
@@ -239,7 +216,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 //        });
 
         mCurrentLocation.setOnClickListener(this::CurrentLocation);
-
+        mDirection.setOnClickListener(this::direction);
         mLocationClient= new FusedLocationProviderClient(this);
         mLocationCallback = new  LocationCallback(){
 
@@ -252,14 +229,14 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
                 }
 
                 runOnUiThread(() -> {
-                    Log.i("loc", "onLocationResult: Execute");
                     Location address= locationResult.getLastLocation();
                     CurrentLocation_Lat=address.getLatitude();
                     CurrentLocation_Long=address.getLongitude();
 
                     Toast.makeText(Home.this,"Lat:- " +address.getLatitude()+"\n Long:- "+address.getLongitude(), LENGTH_LONG).show();
                     LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+                    Log.i("loc", "onLocationResult: Execute"+latLng);
+                    mMap.addMarker(new MarkerOptions().position(latLng).icon(bitmapDescriptorFromVector(getApplicationContext())));
 
                 });
 
@@ -327,37 +304,107 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 //            }
 //        });
 
-        bottomNavigationView.setSelectedItemId(R.id.home);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+//        bottomNavigationView.setSelectedItemId(R.id.home);
+//        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+//                switch (menuItem.getItemId()){
+//
+//                    case R.id.home:
+//                        return true;
+//
+//                    case R.id.search:
+//                        startActivity(new Intent(Home.this, Search.class));
+//                        overridePendingTransition(0,0);
+//                        return true;
+//
+//                    case R.id.history:
+//                        startActivity(new Intent(Home.this, History.class));
+//                        overridePendingTransition(0,0);
+//                        return true;
+//
+//                    case R.id.profile:
+//                        startActivity(new Intent(Home.this, Profile.class));
+//                        overridePendingTransition(0,0);
+//                        return true;
+//                }
+//                return false;
+//            }
+//        });
+
+        chipNavigationBar.setItemSelected(chip_home,true);
+        chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()){
+            public void onItemSelected(int i) {
 
-                    case R.id.home:
-                        return true;
+                switch (i){
 
-                    case R.id.search:
-                        startActivity(new Intent(Home.this, Search.class));
-                        overridePendingTransition(0,0);
-                        return true;
+                    case R.id.chip_home:
+                        break;
 
-                    case R.id.history:
+                    case R.id.chip_history:
                         startActivity(new Intent(Home.this, History.class));
                         overridePendingTransition(0,0);
-                        return true;
+                        finish();
 
-                    case R.id.profile:
+                        break;
+
+                    case R.id.chip_profile:
                         startActivity(new Intent(Home.this, Profile.class));
                         overridePendingTransition(0,0);
-                        return true;
+                        finish();
+
+                        break;
+
                 }
-                return false;
+
             }
         });
 
 
-
     }
+
+
+//    @Override
+//    public void onWindowFocusChanged(boolean hasFocus) {
+//        super.onWindowFocusChanged(hasFocus);
+//        if (hasFocus) {
+//            hideSystemUI();
+//        }
+//    }
+//    @Nullable
+////    @Override
+////    public ActionMode onWindowStartingActionMode(ActionMode.Callback callback) {
+////        hideSystemUI();
+////        return super.onWindowStartingActionMode(callback);
+////
+////    }
+
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hideSystemUI();
+
+            }
+        }, 2000);
+    }
+
 
     private void isCurrentLocation() {
 
@@ -371,7 +418,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
                         CurrentLocation_Lat =dataSnapshot.child("Latitude").getValue(Double.class);
                         CurrentLocation_Long =dataSnapshot.child("Longitude").getValue(Double.class);
 
-                        Log.i("List", "onDataChange: Execute");
+                        Log.i(TAG, "onDataChange: Execute");
                     }
 
                     @Override
@@ -396,14 +443,26 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 //    }
 
 
-    private String getUrl(double latitude , double longitude , String nearbyPlace){
+    private String getUrl(double latitude , double longitude , String nearbyPlace,String type){
 
         StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlaceUrl.append("location="+latitude+","+longitude);
-        googlePlaceUrl.append("&radius="+2500);
-        googlePlaceUrl.append("&type="+nearbyPlace);
+        googlePlaceUrl.append("&radius="+3500);
+        googlePlaceUrl.append("&type="+null);
+        googlePlaceUrl.append("&keyword="+nearbyPlace);
         googlePlaceUrl.append("&sensor=true");
         googlePlaceUrl.append("&key="+apiKey_nearByPlace);
+        Log.i(TAG, "url = "+googlePlaceUrl.toString());
+
+        return googlePlaceUrl.toString();
+    }
+    private String getUrlog(){
+
+        StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
+        googlePlaceUrl.append("place_id=ChIJXYUPmonI5zsRtzdPzAGUyv4");
+        googlePlaceUrl.append("&fields="+"name,rating,formatted_phone_number");
+        googlePlaceUrl.append("&key="+apiKey_nearByPlace);
+
         Log.i(TAG, "url = "+googlePlaceUrl.toString());
 
         return googlePlaceUrl.toString();
@@ -527,7 +586,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 
     private void initViews() {
 
-        bottomNavigationView=findViewById(R.id.bottom_navigation_bar);
+//        bottomNavigationView=findViewById(R.id.chip_navigation_bar);
         frameLayout = findViewById(R.id.map_fragment);
         mCurrentLocation = findViewById(R.id.fab_myLocation);
         mDirection = findViewById(R.id.fab_direction);
@@ -535,6 +594,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
         atm=findViewById(R.id.atm);
         hotel=findViewById(R.id.hotel);
         school=findViewById(R.id.school);
+        chipNavigationBar=findViewById(R.id.chip_navigation_bar);
 //        searchView = findViewById(R.id.search_View);
 
 //        materialSearchBar = findViewById(R.id.searchBar);
@@ -607,7 +667,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
     public void onClick(View v)
     {
         Object[] dataTransfer = new Object[2];
-        GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
+        GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData(mContext);
+        GetNearbyPlacesDataog getNearbyPlacesDataog=new GetNearbyPlacesDataog(mContext);
 
         switch(v.getId()) {
 //            case R.id.btnSearch:
@@ -667,8 +728,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 //            }
             case R.id.restaurant: {
                 mMap.clear();
-                String Restaurant = "restaurant";
-                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, Restaurant);
+                String search = "restaurant";
+                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search,null);
 
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
@@ -679,20 +740,21 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
             }
             case R.id.school: {
                 mMap.clear();
-                String School = "school";
-                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, School);
-
+                String search = "School",type="college";
+                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search,type);
+//                    String url = getUrlog();
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
+
                 Toast.makeText(Home.this, "Showing Nearby Schools", Toast.LENGTH_SHORT).show();
                 break;
             }
             case R.id.atm: {
                 mMap.clear();
-                String Atm = "atm";
-                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, Atm);
+                String search = "atm";
+                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search,null);
 
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
@@ -715,8 +777,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
 //            }
             case R.id.hotel: {
                 mMap.clear();
-                String Hotel = "hotel";
-                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, Hotel);
+                String search = "hospital";
+                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search,null);
 
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
@@ -729,7 +791,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
     }
 
      Context getContext(){
-        return mContext=Home.this;
+        return mContext;
     }
 
     private void location(double Lang, double Long) {
@@ -742,9 +804,38 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
     private void showMarker(LatLng latLng) {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
+        markerOptions.icon(bitmapDescriptorFromVector(this));
         mMap.addMarker(markerOptions);
+
     }
 
+    public void addlist(ArrayList arrayList_Lat, ArrayList arrayList_Long) {
+
+            list_Lat= (ArrayList) arrayList_Lat.clone();
+            this.list_Long = (ArrayList) arrayList_Long.clone();
+
+        double v1= (double) list_Lat.get(5);
+        double v2= (double) list_Long.get(5);
+        LatLng latlang=new LatLng(v1,v2);
+//            showMarker(latlang);
+        Log.i(TAG, "addList Print: "+list_Lat.get(5)+" "+list_Long.get(5)+latlang);
+//        location(v1,v2);
+    }
+
+    private void direction(View view) {
+
+
+    }
+    private BitmapDescriptor bitmapDescriptorFromVector(Context applicationContext) {
+//        Drawable vectorDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_hospital);
+        Drawable vectorDrawable = applicationContext.getResources().getDrawable(R.drawable.ic_school);
+        Objects.requireNonNull(vectorDrawable).setBounds(0,0,vectorDrawable.getIntrinsicWidth(),vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        Log.i(TAG, "bitmapDescriptorFromVectorGetNearby Loction: ");
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
     @Override
     protected void onPause() {
         super.onPause();
@@ -755,7 +846,10 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(TAG, "onStop: ");
+
+        mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Latitude").setValue(CurrentLocation_Lat);
+        mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Longitude").setValue(CurrentLocation_Long);
+        Log.i(TAG, "onStop: "+CurrentLocation_Lat+CurrentLocation_Long);
 
 
     }
@@ -769,9 +863,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
             Log.i(TAG, "onResume: IF Excuted " +CurrentLocation_Lat+CurrentLocation_Long);
             mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Latitude").setValue(CurrentLocation_Lat);
             mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Longitude").setValue(CurrentLocation_Long);
-            isCurrentLocation();
         }
-
 
     }
 
@@ -787,9 +879,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "onDestroy: ");
-        mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Latitude").setValue(CurrentLocation_Lat);
-        mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Longitude").setValue(CurrentLocation_Long);
+
+        Log.i(TAG, "onDestroy: "+CurrentLocation_Lat+CurrentLocation_Long);
 
         if (handlerThread!=null){
             handlerThread.quitSafely();

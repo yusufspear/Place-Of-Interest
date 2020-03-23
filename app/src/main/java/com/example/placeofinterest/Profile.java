@@ -6,26 +6,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.model.GlideUrl;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -38,16 +33,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.theartofdev.edmodo.cropper.CropImageView.CropShape;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.UUID;
+
+import static com.example.placeofinterest.R.id.chip_home;
+import static com.example.placeofinterest.R.id.chip_profile;
 
 public class Profile extends AppCompatActivity {
 
@@ -56,7 +53,7 @@ public class Profile extends AppCompatActivity {
     Button signout,addNewPlace,viewInstant,editProfile;
     private TextView mOutputText;
     ImageView userphoto,uploadImageButton;
-    BottomNavigationView bottomNavigationView;
+    ChipNavigationBar chipNavigationBar;
     private FirebaseAuth mAuth;
     private Uri filePath;
     private StorageReference mStorageRef;
@@ -67,10 +64,11 @@ public class Profile extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View doorView = getWindow().getDecorView();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            doorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-        }
+        hideSystemUI();
+//        View doorView = getWindow().getDecorView();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            doorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
+//        }
         setContentView(R.layout.activity_profile);
         initViews();
 
@@ -86,6 +84,33 @@ public class Profile extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference().child("Profile Image").child(uid);
         mDataRef = FirebaseDatabase.getInstance().getReference("User");
 
+        chipNavigationBar.setItemSelected(chip_profile,true);
+        chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(int i) {
+
+                switch (i){
+
+                    case R.id.chip_profile:
+                        break;
+
+                    case R.id.chip_home:
+                        startActivity(new Intent(Profile.this, Home.class));
+                        overridePendingTransition(0,0);
+                        finish();
+                        break;
+
+                    case R.id.chip_history:
+                        startActivity(new Intent(Profile.this, History.class));
+                        overridePendingTransition(0,0);
+                        finish();
+
+                        break;
+
+                }
+
+            }
+        });
 
         checkProfileImage(user);
         mDataRef.child(mAuth.getCurrentUser().getUid())
@@ -113,37 +138,75 @@ public class Profile extends AppCompatActivity {
 
         signout.setOnClickListener(this::signOutUser);
 
-        bottomNavigationView.setSelectedItemId(R.id.profile);
-
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()){
-
-                    case R.id.profile:
-                        return true;
-
-                    case R.id.home:
-                        startActivity(new Intent(Profile.this, Home.class));
-                        overridePendingTransition(0,0);
-                        return true;
-
-                    case R.id.search:
-                        startActivity(new Intent(Profile.this, Search.class));
-                        overridePendingTransition(0,0);
-                        return true;
-
-                    case R.id.history:
-                        startActivity(new Intent(Profile.this, History.class));
-                        overridePendingTransition(0,0);
-                        return true;
-                }
-                return false;
-            }
-        });
+//        bottomNavigationView.setSelectedItemId(R.id.profile);
+//
+//        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+//                switch (menuItem.getItemId()){
+//
+//                    case R.id.profile:
+//                        return true;
+//
+//                    case R.id.home:
+//                        startActivity(new Intent(Profile.this, Home.class));
+//                        overridePendingTransition(0,0);
+//                        return true;
+//
+//                    case R.id.search:
+//                        startActivity(new Intent(Profile.this, Search.class));
+//                        overridePendingTransition(0,0);
+//                        return true;
+//
+//                    case R.id.history:
+//                        startActivity(new Intent(Profile.this, History.class));
+//                        overridePendingTransition(0,0);
+//                        return true;
+//                }
+//                return false;
+//            }
+//        });
 
     }
 
+    @Nullable
+    @Override
+    public ActionMode onWindowStartingActionMode(ActionMode.Callback callback) {
+        onWindowFocusChanged(true);
+        return super.onWindowStartingActionMode(callback);
+
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
+    }
+
+    private void hideSystemUI() {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hideSystemUI();
+            }
+        }, 1500);
+    }
     private void checkProfileImage(FirebaseUser user) {
         if (user!=null){
             Log.i("which", "User NOT NULL ");
@@ -294,7 +357,7 @@ private void getDownloadUrl(StorageReference reference) {
 
     private void initViews() {
 
-        bottomNavigationView=findViewById(R.id.bottom_navigation_bar);
+        chipNavigationBar=findViewById(R.id.chip_navigation_bar);
         signout=findViewById(R.id.btn_singoutuser);
         mOutputText=findViewById(R.id.txt1);
         addNewPlace =findViewById(R.id.addnew_place);

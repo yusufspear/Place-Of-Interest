@@ -20,14 +20,14 @@
 <!--        app:layout_constraintVertical_bias="1.0"/>-->
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation_bar"
+        android:id="@+id/chip_navigation_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_margin="0dp"
         android:elevation="15dp"
         android:gravity="center"
         app:itemIconTint="@color/Blue"
-        app:itemTextColor="@color/Purpal"
+        app:itemTextColor="@color/Purple"
         android:background="@color/colorWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
