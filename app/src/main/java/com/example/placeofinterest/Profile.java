@@ -169,21 +169,21 @@ public class Profile extends AppCompatActivity {
 
     }
 
-    @Nullable
-    @Override
-    public ActionMode onWindowStartingActionMode(ActionMode.Callback callback) {
-        onWindowFocusChanged(true);
-        return super.onWindowStartingActionMode(callback);
-
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            hideSystemUI();
-        }
-    }
+//    @Nullable
+//    @Override
+//    public ActionMode onWindowStartingActionMode(ActionMode.Callback callback) {
+//        onWindowFocusChanged(true);
+//        return super.onWindowStartingActionMode(callback);
+//
+//    }
+//
+//    @Override
+//    public void onWindowFocusChanged(boolean hasFocus) {
+//        super.onWindowFocusChanged(hasFocus);
+//        if (hasFocus) {
+//            hideSystemUI();
+//        }
+//    }
 
     private void hideSystemUI() {
         // Enables regular immersive mode.
@@ -204,9 +204,12 @@ public class Profile extends AppCompatActivity {
             @Override
             public void run() {
                 hideSystemUI();
+
             }
-        }, 1500);
+        }, 2000);
     }
+
+
     private void checkProfileImage(FirebaseUser user) {
         if (user!=null){
             Log.i("which", "User NOT NULL ");

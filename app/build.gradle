@@ -28,6 +28,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+
     implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
     implementation 'com.google.android.libraries.places:places:2.2.0'
@@ -37,7 +38,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'com.google.firebase:firebase-analytics:17.2.3'
+    implementation 'com.google.firebase:firebase-analytics:17.3.0'
     implementation 'com.google.firebase:firebase-auth:19.3.0'
     implementation 'com.google.firebase:firebase-database:19.2.1'
     implementation 'com.google.firebase:firebase-storage:19.1.1'
@@ -51,6 +52,10 @@ dependencies {
 
     implementation"org.jetbrains.kotlin:kotlin-stdlib:1.3.70"
     implementation 'com.ismaeldivita.chipnavigation:chip-navigation-bar:1.3.0'
+
+    //Google Direction
+    implementation 'com.google.maps:google-maps-services:0.11.0'
+    implementation 'org.slf4j:slf4j-simple:1.7.25'
 
 }
 apply plugin: 'com.google.gms.google-services'

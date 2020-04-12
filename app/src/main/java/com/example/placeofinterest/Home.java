@@ -3,12 +3,14 @@ package com.example.placeofinterest;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -26,6 +28,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 
+import com.example.placeofinterest.module.PolylineData;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -34,14 +37,18 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnPolylineClickListener;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -59,19 +66,29 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.PendingResult;
+import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.TravelMode;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.Vector;
 
 import static android.widget.Toast.LENGTH_LONG;
 import static com.example.placeofinterest.R.id.chip_home;
 
 
-public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallback {
+public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPolylineClickListener {
 
     private static final double Lat= 19.077806;
     private static final double Long= 72.883056;
@@ -79,11 +96,10 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
     private static final int PROXIMITY_RADIUS = 20000;
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
 
-    GoogleMap mMap;
+    public static GoogleMap mMap;
     FloatingActionButton mCurrentLocation, mDirection;
     FrameLayout frameLayout;
     Button rest,atm,hotel,school;
-    //    SearchView searchView;
     private static String TAG="TAG";
     BottomNavigationView bottomNavigationView;
     ChipNavigationBar chipNavigationBar;
@@ -105,7 +121,10 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
 
     public ArrayList list_Lat = new ArrayList<Double>();
     public ArrayList list_Long = new ArrayList<Double>();
+    public ArrayList<LatLng> MarkerPoints;
 
+    private GeoApiContext mGeoApiContext=null;
+    private ArrayList<PolylineData> mPolyLinesData = new ArrayList<>();
 
 
     @Override
@@ -136,10 +155,17 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
                 .commit();
 
         supportMapFragment.getMapAsync(this);
+
+
         initViews();
         apiKey = getString(R.string.google_maps_key);
         apiKey_nearByPlace= getString(R.string.browser_key_for_NearByPlaceAPI);
+        if (mGeoApiContext==null){
+            mGeoApiContext =new GeoApiContext.Builder().apiKey(apiKey_nearByPlace).build();
+        }
 
+        // Initializing
+        MarkerPoints = new ArrayList<>();
 
         if (!Places.isInitialized()) {
             Places.initialize(Home.this, apiKey);
@@ -169,14 +195,12 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
                         LatLng address = place.getLatLng();
                         mMap.animateCamera(CameraUpdateFactory.zoomTo(4.0f));
                         Marker marker = null;
-                        try {
-                            marker = mMap.addMarker(new MarkerOptions().position(address).draggable(true).title(place.getName())
-                                    .snippet(  "ADDRESS:  "+place.getAddress() +"\nRATING: "+place.getRating()+" ("+place.getUserRatingsTotal()+" )"
-                                            +"\nCONTACT: "+place.getPhoneNumber()+"\nWEBSITE: "+new URL(place.getWebsiteUri().toString())));
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        }
+                        marker = mMap.addMarker(new MarkerOptions().position(address).title(place.getName())
+                                .snippet(  "ADDRESS:  "+place.getAddress() +"\nRATING: "+place.getRating()+" ("+place.getUserRatingsTotal()+" )"
+                                        +"\nCONTACT: "+place.getPhoneNumber()+"\nWEBSITE: "+place.getWebsiteUri()));
                         marker.hideInfoWindow();
+
+                        MarkerPoints.add(1,address);
                         CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(address,18);
                         mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
                         @Override
@@ -187,6 +211,7 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
                         public void onCancel() {
                         }
                     });
+                        mDirection.setVisibility(View.VISIBLE);
                     }
                 Log.i(TAG, "PlaceText: " + text);
 
@@ -235,6 +260,7 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
 
                     Toast.makeText(Home.this,"Lat:- " +address.getLatitude()+"\n Long:- "+address.getLongitude(), LENGTH_LONG).show();
                     LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
+
                     Log.i("loc", "onLocationResult: Execute"+latLng);
                     mMap.addMarker(new MarkerOptions().position(latLng).icon(bitmapDescriptorFromVector(getApplicationContext())));
 
@@ -447,7 +473,7 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
 
         StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlaceUrl.append("location="+latitude+","+longitude);
-        googlePlaceUrl.append("&radius="+3500);
+        googlePlaceUrl.append("&radius="+3000);
         googlePlaceUrl.append("&type="+null);
         googlePlaceUrl.append("&keyword="+nearbyPlace);
         googlePlaceUrl.append("&sensor=true");
@@ -456,16 +482,25 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
 
         return googlePlaceUrl.toString();
     }
-    private String getUrlog(){
 
-        StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json?");
-        googlePlaceUrl.append("place_id=ChIJXYUPmonI5zsRtzdPzAGUyv4");
-        googlePlaceUrl.append("&fields="+"name,rating,formatted_phone_number");
-        googlePlaceUrl.append("&key="+apiKey_nearByPlace);
+    private String getUrl_Direction(LatLng origin,LatLng dest){
 
-        Log.i(TAG, "url = "+googlePlaceUrl.toString());
+//        StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/directions/json?");
+//        googlePlaceUrl.append("origin=");
+//        googlePlaceUrl.append("&destination=19.076194,72.886309");
+//        googlePlaceUrl.append("&key="+apiKey_nearByPlace);
+//        Log.i(TAG, "url = "+googlePlaceUrl.toString());
+//
+//        return googlePlaceUrl.toString();
 
-        return googlePlaceUrl.toString();
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        String sensor = "sensor=true";
+        String parameters = str_origin + "&" + str_dest + "&" + sensor;
+        String output = "json";
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters+"&key="+apiKey_nearByPlace;
+        Log.i(TAG, "getUrl_Direction: " + url);
+        return url;
     }
     private void CurrentLocation(View view) {
 
@@ -480,10 +515,11 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
                         Location address = task.getResult();
                         mMap.animateCamera(CameraUpdateFactory.zoomTo(3.0f));
                         LatLng latLng=new LatLng(address.getLatitude(),address.getLongitude());
+                        MarkerPoints.add(0,latLng);
                         deviceCurrentLocation=address;
                         showMarker(latLng);
 
-                        CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(latLng,19);
+                        CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(latLng,18);
                         mMap.animateCamera(cameraUpdate, 1000, new GoogleMap.CancelableCallback() {
                             @Override
                             public void onFinish() {
@@ -557,7 +593,7 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
 //
 //                    LatLng address = place.getLatLng();
 //                    mMap.animateCamera(CameraUpdateFactory.zoomTo(4.0f));
-//                    Marker marker =mMap.addMarker(new MarkerOptions().position(address).draggable(true).title(place.getName())
+//                    Marker marker =mMap.addMarker(new MarkerOptions().position(address).title(place.getName())
 //                            .snippet(  "ADDRESS:  "+place.getAddress() +"\nRATING: "+place.getRating()+"\nCONTACT: "+place.getPhoneNumber()));
 //                    marker.hideInfoWindow();
 //                    mMap.setInfoWindowAdapter(new CustomInfoWindow_Adapter(Home.this));
@@ -596,10 +632,7 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
         school=findViewById(R.id.school);
         chipNavigationBar=findViewById(R.id.chip_navigation_bar);
 //        searchView = findViewById(R.id.search_View);
-
-//        materialSearchBar = findViewById(R.id.searchBar);
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -610,13 +643,157 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setBuildingsEnabled(true);
-
+        mMap.setTrafficEnabled(false);
         mMap.setInfoWindowAdapter(new CustomInfoWindow_Adapter(Home.this));
         LatLng latLng=new LatLng(CurrentLocation_Lat, CurrentLocation_Long);
         Log.i(TAG, "onMapReady: "+CurrentLocation_Lat+CurrentLocation_Long);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,19));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,17));
+        mMap.setOnPolylineClickListener(Home.this);
 
+//        mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+//            @Override
+//            public void onPolylineClick(Polyline polyline) {
+//
+//                for(PolylineData polylineData: mPolyLinesData){
+//                    Log.d(TAG, "onPolylineClick: toString: " + polylineData.toString());
+//                    if(polyline.getId().equals(polylineData.getPolyline().getId())){
+//                        polylineData.getPolyline().setColor(Color.BLUE);
+//                        polylineData.getPolyline().setZIndex(1);
+//                    }
+//                    else{
+//                        polylineData.getPolyline().setColor(Color.GRAY);
+//                        polylineData.getPolyline().setZIndex(0);
+//                    }
+//                }
+//
+//            }
+//        });
+//        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+//            @Override
+//            public void onMapClick(LatLng point) {
+//// Already two locations
+//
+//                if (MarkerPoints.size() > 1) {
+//                    MarkerPoints.clear();
+//                    mMap.clear();
+//                }
+//// Adding new item to the ArrayList
+//                MarkerPoints.add(point);
+//// Creating MarkerOptions
+//                MarkerOptions options = new MarkerOptions();
+//// Setting the position of the marker
+//                options.position(point);
+///**
+// * For the start location, the color of marker is GREEN and
+// * for the end location, the color of marker is RED.
+// */
+//                if (MarkerPoints.size() == 1) {
+//                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//                } else if (MarkerPoints.size() == 2) {
+//                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//                }
+//// Add new marker to the Google Map Android API V2
+//                mMap.addMarker(options);
+//// Checks, whether start and end locations are captured
+//                if (MarkerPoints.size() >= 2) {
+//                    LatLng origin = MarkerPoints.get(0);
+//                    LatLng dest = MarkerPoints.get(1);
+//// Getting URL to the Google Directions API
+//                    String url = getUrl_Direction(origin, dest);
+//                    Log.d("onMapClick", url.toString());
+//                    FetchUrl FetchUrl = new FetchUrl();
+//// Start downloading json data from Google Directions API
+//                    FetchUrl.execute(url);
+////move map camera
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLng(origin));
+//                    mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+//                }
+//            }
+//        });
     }
+    private void calculateDirections(LatLng origin,LatLng dest){
+        Log.i(TAG, "calculateDirections: Executed");
+//        com.google.maps.model.LatLng destination = new com.google.maps.model.LatLng(
+//                marker.getPosition().latitude,
+//                marker.getPosition().longitude
+//        );
+        DirectionsApiRequest directions = new DirectionsApiRequest(mGeoApiContext);
+        directions.alternatives(true);
+        directions.origin(new com.google.maps.model.LatLng(origin.latitude,origin.longitude));
+        Log.i(TAG, "calculateDirections: destination: " + dest.toString());
+        directions.mode(TravelMode.WALKING);
+        directions.alternatives(true);
+        directions.destination(new com.google.maps.model.LatLng(dest.latitude,dest.longitude)).setCallback(new PendingResult.Callback<DirectionsResult>() {
+            @Override
+            public void onResult(DirectionsResult result) {
+                Log.i(TAG, "calculateDirections: routes: " + result.routes[0].toString());
+                Log.i(TAG, "calculateDirections: routes: " + result.routes[0].legs[0].distance);
+                Log.i(TAG, "calculateDirections: routes: " + result.routes[0].legs[0].duration);
+                Log.i(TAG, "calculateDirections: geocodedWayPoints: " + result.geocodedWaypoints[0].toString());
+                addPolylinesToMap(result);
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                Log.e(TAG, "onFailure: " + e.getMessage() );
+
+            }
+        });
+    }
+
+    private void addPolylinesToMap(final DirectionsResult result){
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "run: result routes: " + result.routes.length);
+                if(mPolyLinesData.size() > 0){
+                    for(PolylineData polylineData: mPolyLinesData){
+                        polylineData.getPolyline().remove();
+                    }
+                    mPolyLinesData.clear();
+                    mPolyLinesData = new ArrayList<>();
+                }
+
+                for(DirectionsRoute route: result.routes){
+                    Log.d(TAG, "run: leg: " + route.legs[0].toString());
+                    List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
+
+                    List<LatLng> newDecodedPath = new ArrayList<>();
+
+                    // This loops through all the LatLng coordinates of ONE polyline.
+                    for(com.google.maps.model.LatLng latLng: decodedPath){
+
+//                        Log.d(TAG, "run: latlng: " + latLng.toString());
+
+                        newDecodedPath.add(new LatLng(
+                                latLng.lat,
+                                latLng.lng
+                        ));
+                    }
+                    Polyline polyline = mMap.addPolyline(new PolylineOptions().addAll(newDecodedPath));
+                    polyline.setColor(Color.GRAY);
+                    polyline.setClickable(true);
+                    mPolyLinesData.add(new PolylineData(polyline, route.legs[0]));
+
+                }
+            }
+        });
+    }
+    @Override
+    public void onPolylineClick(Polyline polyline) {
+        for(PolylineData polylineData: mPolyLinesData){
+            Log.d(TAG, "onPolylineClick: toString: " + polylineData.toString());
+            if(polyline.getId().equals(polylineData.getPolyline().getId())){
+                polylineData.getPolyline().setColor(Color.CYAN);
+                polylineData.getPolyline().setZIndex(1);
+            }
+            else{
+                polylineData.getPolyline().setColor(Color.GRAY);
+                polylineData.getPolyline().setZIndex(0);
+            }
+        }
+    }
+
 
     private void LocationUpdate(){
         LocationRequest locationRequest = LocationRequest.create();
@@ -777,7 +954,7 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
 //            }
             case R.id.hotel: {
                 mMap.clear();
-                String search = "hospital";
+                String search = "hotel";
                 String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search,null);
 
                 dataTransfer[0] = mMap;
@@ -789,11 +966,6 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
-     Context getContext(){
-        return mContext;
-    }
-
     private void location(double Lang, double Long) {
 
         LatLng latLng=new LatLng(Lang,Long);
@@ -823,6 +995,40 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void direction(View view) {
+
+        // Getting URL to the Google Directions API
+        LatLng origin=MarkerPoints.get(0);
+        LatLng destination=MarkerPoints.get(1);
+        calculateDirections(origin,destination);
+
+//        //Using URL to find Direction
+//        String url = getUrl_Direction(origin, distination);
+//        Log.d("onMapClick", url.toString());
+//        FetchUrl FetchUrl = new FetchUrl();
+//        // Start downloading json data from Google Directions API
+//        FetchUrl.execute(url);
+//        //move map camera
+//
+//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//        builder.include(origin);
+//        builder.include(distination);
+//
+//        LatLngBounds tmpBounds = builder.build();
+//        LatLng center = tmpBounds.getCenter();
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(tmpBounds, 300));
+
+
+
+//        mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
+//            @Override
+//            public void onFinish() {
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//            }
+//        });
+
 
 
     }
@@ -886,6 +1092,8 @@ public class Home<poblic> extends AppCompatActivity implements OnMapReadyCallbac
             handlerThread.quitSafely();
         }
     }
+
+
 }
 
 
