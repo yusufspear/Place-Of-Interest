@@ -199,8 +199,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                                 .snippet(  "ADDRESS:  "+place.getAddress() +"\nRATING: "+place.getRating()+" ("+place.getUserRatingsTotal()+" )"
                                         +"\nCONTACT: "+place.getPhoneNumber()+"\nWEBSITE: "+place.getWebsiteUri()));
                         marker.hideInfoWindow();
-
-                        MarkerPoints.add(1,address);
+                        MarkerPoints.add(address);
                         CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(address,18);
                         mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
                         @Override
@@ -257,9 +256,9 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                     Location address= locationResult.getLastLocation();
                     CurrentLocation_Lat=address.getLatitude();
                     CurrentLocation_Long=address.getLongitude();
-
                     Toast.makeText(Home.this,"Lat:- " +address.getLatitude()+"\n Long:- "+address.getLongitude(), LENGTH_LONG).show();
                     LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
+                    MarkerPoints.add(latLng);
 
                     Log.i("loc", "onLocationResult: Execute"+latLng);
                     mMap.addMarker(new MarkerOptions().position(latLng).icon(bitmapDescriptorFromVector(getApplicationContext())));
@@ -498,7 +497,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         String sensor = "sensor=true";
         String parameters = str_origin + "&" + str_dest + "&" + sensor;
         String output = "json";
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters+"&key="+apiKey_nearByPlace;
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters+"&alternatives=true"+"&key="+apiKey_nearByPlace;
         Log.i(TAG, "getUrl_Direction: " + url);
         return url;
     }
@@ -515,7 +514,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                         Location address = task.getResult();
                         mMap.animateCamera(CameraUpdateFactory.zoomTo(3.0f));
                         LatLng latLng=new LatLng(address.getLatitude(),address.getLongitude());
-                        MarkerPoints.add(0,latLng);
+                        MarkerPoints.add(latLng);
                         deviceCurrentLocation=address;
                         showMarker(latLng);
 
@@ -721,7 +720,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         directions.alternatives(true);
         directions.origin(new com.google.maps.model.LatLng(origin.latitude,origin.longitude));
         Log.i(TAG, "calculateDirections: destination: " + dest.toString());
-        directions.mode(TravelMode.WALKING);
+        directions.mode(TravelMode.TRANSIT);
         directions.alternatives(true);
         directions.destination(new com.google.maps.model.LatLng(dest.latitude,dest.longitude)).setCallback(new PendingResult.Callback<DirectionsResult>() {
             @Override
@@ -1002,7 +1001,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         calculateDirections(origin,destination);
 
 //        //Using URL to find Direction
-//        String url = getUrl_Direction(origin, distination);
+//        String url = getUrl_Direction(origin, destination);
 //        Log.d("onMapClick", url.toString());
 //        FetchUrl FetchUrl = new FetchUrl();
 //        // Start downloading json data from Google Directions API
@@ -1011,14 +1010,14 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 //
 //        LatLngBounds.Builder builder = new LatLngBounds.Builder();
 //        builder.include(origin);
-//        builder.include(distination);
+//        builder.include(destination);
 //
 //        LatLngBounds tmpBounds = builder.build();
 //        LatLng center = tmpBounds.getCenter();
-//        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(tmpBounds, 300));
+//        mMap.animateCamera(CameraUpdateFactory.newLatLng(center));
 
-
-
+//
+//
 //        mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
 //            @Override
 //            public void onFinish() {
