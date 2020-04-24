@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="Home"
+        tools:ignore="HardcodedText" />
+
+    <item
+        android:title="Action"
+        tools:ignore="HardcodedText">
+
+        <menu>
+
+
+            <group android:checkableBehavior="single">
+
+
+                <item
+                    android:id="@+id/share_your_location"
+                    android:icon="@drawable/ic_current_place"
+                    android:title="Share Your Location"
+                    tools:ignore="HardcodedText" />
+
+
+                <item
+                    android:id="@+id/add_new_place"
+                    android:icon="@drawable/ic_add_location_black_24dp"
+                    android:title="Add New Interest"
+                    tools:ignore="HardcodedText" />
+
+            </group>
+        </menu>
+
+    </item>
+
+    <item
+        android:title="Profile"
+        tools:ignore="HardcodedText">
+
+        <menu>
+            <group android:checkableBehavior="single">
+
+                <item
+                    android:id="@+id/favorite_place"
+                    android:icon="@drawable/ic_heart"
+                    android:title="Favorite POI"
+                    tools:ignore="HardcodedText" />
+            </group>
+
+        </menu>
+    </item>
+</menu>

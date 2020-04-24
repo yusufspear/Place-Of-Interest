@@ -40,4 +40,12 @@
     <string name="banks">Banks</string>
     <string name="schools">Schools</string>
     <string name="search">Search</string>
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+    <string-array name="mode_list" >
+        <item> DRIVING </item>
+        <item> WALKING </item>
+        <item> TRANSIT </item>
+        <item> BICYCLING </item>
+    </string-array>
 </resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <rotate android:drawable="@drawable/horizontal_dash_line"
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:fromDegrees="90"
+            android:toDegrees="90"/>
+    </item>
+
+</selector>

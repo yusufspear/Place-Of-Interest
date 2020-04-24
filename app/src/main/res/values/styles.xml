@@ -1,11 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
     <style name="AppTheme.Lighter.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
 
@@ -14,10 +15,11 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <!--        <item name="colorPrimaryDark">@color/colorBlack</item>-->
-        <item name="android:navigationBarColor">@color/colorWhite</item>
-        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1" >@color/pureGray</item>
-    <item name="android:statusBarColor">@color/colorBlack</item>
+        <item name="android:windowTranslucentStatus">true</item>
+<!--        &lt;!&ndash;        <item name="colorPrimaryDark">@color/colorBlack</item>&ndash;&gt;-->
+<!--        <item name="android:navigationBarColor">@color/colorWhite</item>-->
+<!--        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1" >@color/pureGray</item>-->
+<!--    <item name="android:statusBarColor">@color/colorBlack</item>-->
 
     </style>
 
