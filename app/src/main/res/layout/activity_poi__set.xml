@@ -12,6 +12,9 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,6 +24,7 @@
         android:id="@+id/fab_add"
         android:layout_width="80dp"
         android:layout_height="80dp"
+        android:layout_marginEnd="60dp"
         android:layout_marginBottom="60dp"
         android:backgroundTint="@color/colorWhite"
         android:clickable="true"
@@ -31,26 +35,28 @@
         app:elevation="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
         tools:ignore="UnusedAttribute,VectorDrawableCompat"
         tools:targetApi="m" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_confirm"
+        android:id="@+id/fab_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="60dp"
+
         android:backgroundTint="@color/colorWhite"
         android:clickable="true"
-
         android:focusable="true"
         app:borderWidth="0dp"
         app:elevation="12dp"
         app:layout_constraintBottom_toBottomOf="@+id/fab_add"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/fab_add"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/fab_add"
-        app:srcCompat="@drawable/ic_send_black_24dp"
+        app:srcCompat="@drawable/ic_delete_forever_black_24dp"
         tools:ignore="VectorDrawableCompat"
         tools:targetApi="lollipop" />
 

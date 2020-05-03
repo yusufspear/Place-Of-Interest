@@ -45,9 +45,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Home"
-            android:theme="@style/AppTheme.NoActionBar" /> <!-- <activity -->
-        <!-- android:name=".POI_Set" -->
-        <!-- android:theme="@style/AppTheme.NoActionBar" /> -->
+            android:theme="@style/AppTheme.NoActionBar" />
+         <activity
+         android:name=".POI_Set"
+         android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Register_Page"
             android:theme="@style/AppTheme.NoActionBar" />

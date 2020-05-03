@@ -4,21 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/colorPrimaryDark"
-    android:layout_height="200dp">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/header"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layerType="software"
-        android:scaleType="centerCrop"
+    <EditText
+        android:id="@+id/input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter"
+        android:padding="15dp"
+        android:layout_margin="15dp"
+        android:gravity="start"
+        android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_account_circle_black_24dp"
-        tools:ignore="ContentDescription" />
-
+        tools:ignore="Autofill,HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

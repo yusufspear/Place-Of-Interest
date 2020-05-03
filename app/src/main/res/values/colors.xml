@@ -15,6 +15,8 @@
     <color name="Orange">#E2FF5722</color>
     <color name="Red">#FF1744</color>
     <color name="Blue">#00B0FF</color>
-    <color name="Yellow">#FFFF00</color>
+    <color name="Yellow">#FFD600</color>
+    <color name="Pale_Yellow">#F4D140</color>
     <color name="Purple">#8E24AA</color>
+
 </resources>

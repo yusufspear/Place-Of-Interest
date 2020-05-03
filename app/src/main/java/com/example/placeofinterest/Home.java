@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.ToolbarWidgetWrapper;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -15,7 +14,6 @@ import androidx.fragment.app.FragmentTransaction;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -27,18 +25,18 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 
 
+import com.bumptech.glide.load.ImageHeaderParser;
 import com.example.placeofinterest.module.BottomFragment;
 import com.example.placeofinterest.module.PolylineData;
 import com.example.placeofinterest.module.TopFragment;
@@ -97,8 +95,7 @@ import java.util.Objects;
 
 import static android.widget.Toast.LENGTH_LONG;
 import static com.example.placeofinterest.R.id.chip_home;
-import static com.example.placeofinterest.R.id.destination;
-import static com.example.placeofinterest.R.id.source;
+import static com.example.placeofinterest.R.id.imageButton;
 
 
 public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPolylineClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -110,6 +107,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
 
     public static GoogleMap mMap;
+    private ImageButton top_left_menu;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Toolbar toolbar;
@@ -202,7 +200,15 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         b1 = new Bundle();
         b2 = new Bundle();
 
+//        setSupportActionBar(toolbar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setItemIconTintList(null);
 
+        top_left_menu.setOnClickListener(this::menuPress);
+        navigationView.setNavigationItemSelectedListener(this);
 
         AutocompleteSupportFragment autocompleteSupportFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -427,7 +433,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
     }
 
-    private void setSupportActionBar(ToolbarWidgetWrapper toolbar) {
+    private void menuPress(View view) {
+        drawerLayout.openDrawer(GravityCompat.START);
     }
 
 
@@ -671,12 +678,13 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         atm=findViewById(R.id.atm);
         hotel=findViewById(R.id.hotel);
         school=findViewById(R.id.school);
-//        drawerLayout=findViewById(R.id.drawer_layout);
-//        navigationView=findViewById(R.id.nav_view);
+        drawerLayout=findViewById(R.id.drawer_layout);
+        top_left_menu= findViewById(R.id.imageButton);
+        navigationView=findViewById(R.id.nav_view);
         chipNavigationBar=findViewById(R.id.chip_navigation_bar);
 //        CardView_Place_Autocomplete_Fragment=findViewById(R.id.cardView_place_autocomplete_fragment);
         horizontalScrollView =findViewById(R.id.scrollable_linearLayout);
-        toolbar= findViewById(R.id.cardView_place_autocomplete_fragment);
+//        toolbar= findViewById(R.id.toolbar_home);
     }
 
     @Override
@@ -1129,12 +1137,11 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     }
 
     @Override
-    public void onBackPressed(){
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else
-        {super.onBackPressed();
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -1319,6 +1326,16 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case  R.id.nav_home:
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case  R.id.add_new_place:
+                drawerLayout.closeDrawer(GravityCompat.START);
+                startActivity(new Intent(Home.this, POI_Set.class));
+                finish();
+                break;
+        }
         return true;
     }
 }
