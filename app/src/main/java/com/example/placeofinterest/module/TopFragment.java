@@ -38,8 +38,7 @@ public class TopFragment extends Fragment {
         line1.setInputType(InputType.TYPE_NULL);
         line2.setInputType(InputType.TYPE_NULL);
         imageButton.setOnClickListener(this::backClick);
-//        setData();
-
+        setData();
         return view;
     }
 

@@ -1,8 +1,10 @@
 package com.example.placeofinterest;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Build;
@@ -11,27 +13,38 @@ import android.view.ActionMode;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.placeofinterest.adapter.historyAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
+import java.net.URL;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.placeofinterest.R.id.chip_history;
-import static com.example.placeofinterest.R.id.chip_profile;
 
 public class History extends AppCompatActivity {
     ChipNavigationBar chipNavigationBar;
-//    TextView display;
-//    FrameLayout FragmentHome;
+    RecyclerView recyclerView;
+    historyAdapter historyAdapter;
+    private List<String> destTitle = new ArrayList<>();
+    private List<URL> destUrl = new ArrayList<>();
+    private List<Time> searchTime = new ArrayList<>();
+    private List<String> destPoiType = new ArrayList<>();
+    private List<Float> ratingValue = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        View doorView = getWindow().getDecorView();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            doorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-//        }
         hideSystemUI();
         setContentView(R.layout.activity_history);
         initViews();
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        historyAdapter = new historyAdapter(destTitle,destUrl,searchTime,destPoiType,ratingValue);
+        recyclerView.setAdapter(historyAdapter);
 
         chipNavigationBar.setItemSelected(chip_history,true);
         chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
@@ -130,10 +143,9 @@ public class History extends AppCompatActivity {
         );
     }
     private void initViews() {
-
         chipNavigationBar=findViewById(R.id.chip_navigation_bar);
-//        bottomNavigationView=findViewById(R.id.chip_navigation_bar);
-//        FragmentHome = findViewById(R.id.fragment_home);
+        recyclerView = findViewById(R.id.recyclerView_History);
+
 
 
     }

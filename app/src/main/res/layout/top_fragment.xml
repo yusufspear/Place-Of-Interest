@@ -67,7 +67,6 @@
                 android:inputType="none"
                 android:textSize="16sp"
                 android:text="Source"
-                android:editable="false"
                 android:paddingStart="10dp"
                 android:paddingEnd="0dp"
                 android:background="@drawable/btnsignin"

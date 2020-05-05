@@ -115,7 +115,5 @@ public class POIAdapter extends RecyclerView.Adapter<POIAdapter.POIView> {
             title = itemView.findViewById(id.txt_Title);
 
         }
-
-
     }
 }

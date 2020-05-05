@@ -50,8 +50,8 @@
             </FrameLayout>
 
             <FrameLayout
-                android:id="@+id/fragmentBottom"
-                android:layout_width="0dp"
+                android:id="@+id/fragment_BOTTOM"
+                android:layout_width="match_parent"
                 android:layout_height="130dp"
                 android:layout_margin="8dp"
                 app:layout_constraintBottom_toBottomOf="@+id/map_fragment"
@@ -63,7 +63,7 @@
             </FrameLayout>
 
             <FrameLayout
-                android:id="@+id/fragmentTop"
+                android:id="@+id/fragment_TOP"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:layout_marginStart="5dp"
@@ -74,116 +74,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0">
-
-                <!--        <androidx.cardview.widget.CardView-->
-                <!--            android:id="@+id/cardViewTop"-->
-                <!--            android:layout_width="match_parent"-->
-                <!--            android:layout_height="match_parent"-->
-                <!--            android:foregroundTint="@drawable/cardview_top"-->
-                <!--            android:outlineProvider="none"-->
-                <!--            android:elevation="10dp"-->
-                <!--            app:cardCornerRadius="12dp"-->
-                <!--            android:padding="10dp">-->
-
-                <!--            <androidx.constraintlayout.widget.ConstraintLayout-->
-                <!--                android:layout_width="match_parent"-->
-                <!--                android:layout_height="match_parent">-->
-
-                <!--                <ImageButton-->
-                <!--                    android:id="@+id/back_arrow"-->
-                <!--                    android:layout_width="24dp"-->
-                <!--                    android:layout_height="24dp"-->
-                <!--                    android:layout_margin="4dp"-->
-                <!--                    android:background="@drawable/profileimage"-->
-                <!--                    android:elevation="5dp"-->
-                <!--                    android:src="@drawable/ic_chevron_left_black_24dp"-->
-                <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                <!--                    app:layout_constraintTop_toTopOf="parent"-->
-                <!--                    tools:ignore="ContentDescription" />-->
-
-                <!--                <TextView-->
-                <!--                    android:id="@+id/textView2"-->
-                <!--                    android:layout_width="wrap_content"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_marginEnd="10dp"-->
-                <!--                    android:fontFamily="sans-serif-medium"-->
-                <!--                    android:text="S :"-->
-                <!--                    android:textColor="@color/quantum_grey700"-->
-                <!--                    android:textSize="14sp"-->
-                <!--                    android:textStyle="bold"-->
-                <!--                    app:layout_constraintBottom_toBottomOf="@+id/source"-->
-                <!--                    app:layout_constraintEnd_toStartOf="@+id/source"-->
-                <!--                    app:layout_constraintHorizontal_bias="1.0"-->
-                <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                <!--                    app:layout_constraintTop_toTopOf="@+id/source"-->
-                <!--                    tools:ignore="HardcodedText" />-->
-
-                <!--                <EditText-->
-                <!--                    android:id="@+id/source"-->
-                <!--                    android:layout_width="300dp"-->
-                <!--                    android:layout_height="40dp"-->
-                <!--                    android:layout_marginTop="10dp"-->
-                <!--                    android:layout_marginEnd="16dp"-->
-                <!--                    android:inputType="text"-->
-                <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
-                <!--                    app:layout_constraintEnd_toEndOf="parent"-->
-                <!--                    app:layout_constraintHorizontal_bias="1.0"-->
-                <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                <!--                    app:layout_constraintTop_toTopOf="parent"-->
-                <!--                    app:layout_constraintVertical_bias="0.0"-->
-                <!--                    tools:ignore="Autofill,LabelFor" />-->
-
-                <!--                <View-->
-                <!--                    android:layout_width="50dp"-->
-                <!--                    android:layout_height="0dp"-->
-                <!--                    android:background="@drawable/vertical_dash_line"-->
-                <!--                    android:foregroundGravity="center"-->
-                <!--                    android:layerType="software"-->
-
-                <!--                    android:orientation="vertical"-->
-                <!--                    app:layout_constraintBottom_toTopOf="@+id/destination"-->
-                <!--                    app:layout_constraintEnd_toEndOf="parent"-->
-                <!--                    app:layout_constraintHorizontal_bias="0.3"-->
-                <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                <!--                    app:layout_constraintTop_toBottomOf="@+id/source" />-->
-
-                <!--                <TextView-->
-                <!--                    android:id="@+id/textView3"-->
-                <!--                    android:layout_width="wrap_content"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_marginEnd="10dp"-->
-                <!--                    android:fontFamily="sans-serif-medium"-->
-                <!--                    android:text="D :"-->
-                <!--                    android:textColor="@color/quantum_grey700"-->
-                <!--                    android:textSize="14sp"-->
-                <!--                    android:textStyle="bold"-->
-                <!--                    app:layout_constraintBottom_toBottomOf="@+id/destination"-->
-                <!--                    app:layout_constraintEnd_toStartOf="@+id/destination"-->
-                <!--                    app:layout_constraintHorizontal_bias="1.0"-->
-                <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                <!--                    app:layout_constraintTop_toTopOf="@+id/destination"-->
-                <!--                    app:layout_constraintVertical_bias="0.619"-->
-                <!--                    tools:ignore="HardcodedText" />-->
-
-                <!--                <EditText-->
-                <!--                    android:id="@+id/destination"-->
-                <!--                    android:layout_width="300dp"-->
-                <!--                    android:layout_height="40dp"-->
-                <!--                    android:layout_marginEnd="16dp"-->
-                <!--                    android:layout_marginBottom="10dp"-->
-                <!--                    android:inputType="text"-->
-                <!--                    app:layout_constraintBottom_toBottomOf="parent"-->
-                <!--                    app:layout_constraintEnd_toEndOf="parent"-->
-                <!--                    app:layout_constraintHorizontal_bias="1.0"-->
-                <!--                    app:layout_constraintStart_toStartOf="parent"-->
-                <!--                    app:layout_constraintTop_toBottomOf="@+id/source"-->
-                <!--                    app:layout_constraintVertical_bias="1.0"-->
-                <!--                    tools:ignore="Autofill,LabelFor" />-->
-                <!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
-
-
-                <!--        </androidx.cardview.widget.CardView>-->
-
 
             </FrameLayout>
 
@@ -205,7 +95,7 @@
             <!--        app:mt_placeholder="Search a place"-->
             <!--        app:mt_speechMode="false" />-->
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView3"
+                android:id="@+id/cardView_Search"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginStart="16dp"
@@ -271,7 +161,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/map_fragment"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardView3"
+                app:layout_constraintTop_toBottomOf="@+id/cardView_Search"
                 app:layout_constraintVertical_bias="0.0">
 
 
@@ -379,7 +269,7 @@
                 app:layout_constraintEnd_toEndOf="@+id/map_fragment"
                 app:layout_constraintHorizontal_bias="0.8"
                 app:layout_constraintStart_toStartOf="@+id/map_fragment"
-                app:layout_constraintTop_toTopOf="@+id/fragmentBottom"
+                app:layout_constraintTop_toTopOf="@+id/fragment_BOTTOM"
                 tools:ignore="UnusedAttribute,VectorDrawableCompat"
                 tools:targetApi="m" />
 
