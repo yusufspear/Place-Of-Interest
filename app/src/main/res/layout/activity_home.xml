@@ -43,7 +43,7 @@
                 android:layout_above="@id/chip_navigation_bar"
                 app:layout_constraintBottom_toTopOf="@+id/chip_navigation_bar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -98,8 +98,9 @@
                 android:id="@+id/cardView_Search"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="30dp"
                 android:layout_marginEnd="16dp"
                 android:elevation="8dp"
                 android:orientation="horizontal"
@@ -296,7 +297,7 @@
                 android:focusable="true"
                 android:foreground="@drawable/ic_directions_black_24dp"
                 android:foregroundGravity="center"
-                android:visibility="visible"
+                android:visibility="invisible"
                 app:backgroundTint="@color/Green"
                 app:borderWidth="0dp"
                 app:elevation="8dp"

@@ -22,6 +22,7 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.placeofinterest.R.id.add;
 import static com.example.placeofinterest.R.id.chip_history;
 
 public class History extends AppCompatActivity {
@@ -42,6 +43,11 @@ public class History extends AppCompatActivity {
         setContentView(R.layout.activity_history);
         initViews();
 
+        destTitle.add("Kurla");
+        destUrl.add(null);
+        destPoiType.add("Gym");
+        ratingValue.add(4.0f);
+        searchTime.add(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         historyAdapter = new historyAdapter(destTitle,destUrl,searchTime,destPoiType,ratingValue);
         recyclerView.setAdapter(historyAdapter);

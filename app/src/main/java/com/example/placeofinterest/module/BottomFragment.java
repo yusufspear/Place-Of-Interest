@@ -1,6 +1,5 @@
 package com.example.placeofinterest.module;
-
-import android.location.Location;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +28,7 @@ public class BottomFragment extends Fragment {
     private TextView Device_Time, Distance, Time;
     private Thread thread;
     private Spinner spinner;
-    private LatLng source,destonation;
+    private LatLng source,destination;
     private Double lat_s,long_s,lat_d,long_d;
     private int iCurrentSelection,j=1;
     private String mode_name;
@@ -47,13 +46,12 @@ public class BottomFragment extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 if (iCurrentSelection != position){
-                    // Your code here
                     mode_name = spinner.getItemAtPosition(position).toString();
                     iCurrentSelection = position;
                     Log.i(TAG, "onItemSelected: "+mode_name);
                     Home home= (Home) getActivity();
                     if (isAgain()){
-                        home.calculateDirectionsForMode(source,destonation,mode_name);
+                        home.calculateDirectionsForMode(source,destination,mode_name);
                     }
                 }
             }
@@ -94,9 +92,9 @@ public class BottomFragment extends Fragment {
         long_d = b2.getDouble("Lang_destination");
 
         source = new LatLng(lat_s,long_s);
-        destonation = new LatLng(lat_d,long_d);
+        destination = new LatLng(lat_d,long_d);
 
-        Log.i(TAG, "setData: Location"+source+destonation);
+        Log.i(TAG, "setData: Location"+source+destination);
 
         Log.i(TAG, "setData: " + "BottomFragment " + distance + duration);
 

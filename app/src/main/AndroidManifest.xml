@@ -8,23 +8,26 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Lighter.NoActionBar"
-        android:fullBackupContent="true">
-        <activity android:name=".SplashScreen"
+        android:theme="@style/AppTheme.Lighter.NoActionBar">
+        <activity
+            android:name=".New_Place"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_new__place"
+            android:theme="@style/FullscreenTheme"></activity>
+        <activity
+            android:name=".SplashScreen"
             android:theme="@style/AppTheme.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".Select_POI"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -46,9 +49,9 @@
         <activity
             android:name=".Home"
             android:theme="@style/AppTheme.NoActionBar" />
-         <activity
-         android:name=".POI_Set"
-         android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".POI_Set"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Register_Page"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -60,9 +63,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <uses-library
             android:name="org.apache.http.legacy"

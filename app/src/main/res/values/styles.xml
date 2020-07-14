@@ -6,8 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-<!--        <item name="android:windowTranslucentStatus">true</item>-->
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
     </style>
+
     <style name="AppTheme.Lighter.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
 
     </style>
@@ -16,13 +17,24 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowTranslucentStatus">true</item>
-<!--        &lt;!&ndash;        <item name="colorPrimaryDark">@color/colorBlack</item>&ndash;&gt;-->
-<!--        <item name="android:navigationBarColor">@color/colorWhite</item>-->
-<!--        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1" >@color/pureGray</item>-->
-<!--    <item name="android:statusBarColor">@color/colorBlack</item>-->
+        <!--        &lt;!&ndash;        <item name="colorPrimaryDark">@color/colorBlack</item>&ndash;&gt;-->
+        <!--        <item name="android:navigationBarColor">@color/colorWhite</item>-->
+        <!--        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1" >@color/pureGray</item>-->
+        <!--    <item name="android:statusBarColor">@color/colorBlack</item>-->
 
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="FullscreenTheme" parent="AppTheme.Lighter.NoActionBar">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
 
 </resources>

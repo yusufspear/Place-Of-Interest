@@ -1,5 +1,6 @@
 package com.example.placeofinterest.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,9 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
-public class historyAdapter extends RecyclerView.Adapter {
+import static androidx.constraintlayout.widget.Constraints.TAG;
+
+public class historyAdapter extends RecyclerView.Adapter<historyAdapter.HistoryView> {
 
     private List<String> destTitle = new ArrayList<>();
     private List<URL> destUrl = new ArrayList<>();
@@ -36,19 +39,23 @@ public class historyAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public HistoryView onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_row_template, parent, false);
         return new historyAdapter.HistoryView(view);
     }
 
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull HistoryView holder, int position) {
+
+        holder.destination_title.setText(destTitle.get(position));
+        holder.ratingBar.setRating(ratingValue.get(position));
 
     }
 
     @Override
     public int getItemCount() {
+        Log.i(TAG, "getItemCount: "+destTitle.size());
         return destTitle.size();
     }
 

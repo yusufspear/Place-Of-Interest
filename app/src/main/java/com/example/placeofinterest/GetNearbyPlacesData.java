@@ -86,7 +86,7 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
         for(int i = 0; i < nearbyPlaceList.size(); i++)
         Log.i(TAG, "showNearbyPlaces: List Print"+list_Lat+" "+list_Long);
 
-        home.addlist(list_Lat,list_Long);
+        home.addList(list_Lat,list_Long);
 
     }
 

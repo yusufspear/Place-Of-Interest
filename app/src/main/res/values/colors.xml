@@ -19,4 +19,6 @@
     <color name="Pale_Yellow">#F4D140</color>
     <color name="Purple">#8E24AA</color>
 
+    <color name="black_overlay">#66000000</color>
+
 </resources>
