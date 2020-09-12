@@ -150,6 +150,32 @@ public class MainActivity extends AppCompatActivity {
 
         Objects.requireNonNull(mEmailLayout.getEditText()).addTextChangedListener(new TextWatcher() {
             @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String hint = Objects.requireNonNull(mEmailLayout.getHint()).toString();
+                if (hint.equals("Email is required. Can't be empty.")){
+                    mEmailLayout.setHint("Invalid Email. Enter valid email address.");
+
+                }else if (hint.equals("Invalid Email. Enter valid email address.")){
+                    mEmailLayout.setHint("Enter Email");
+                    mEmailLayout.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#000000")));
+
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+
+            }
+        });
+        Objects.requireNonNull(mPasswordLayout.getEditText()).addTextChangedListener(new TextWatcher() {
+            @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             }
@@ -157,19 +183,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+                String hint= Objects.requireNonNull(mPasswordLayout.getHint()).toString();
+                if (hint.equals("Password is required. Can't be empty.")){
+                    mPasswordLayout.setHint("Enter Password");
+                    mPasswordLayout.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#000000")));
+
+                }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
 
-                String email=editable.toString();
-                if (email.equals("")){
-                    mEmailLayout.setError("Cant Empty");
-                }else if(!Patterns.EMAIL_ADDRESS.matcher(editable).matches()){
-                    mEmailLayout.setError("Pattern NOT Match!");
-                }else {
-                    mEmailLayout.setError(null);
-                }
+
 
             }
         });
@@ -359,7 +384,6 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar = findViewById(R.id.progressbar);
         txtSign_up = findViewById(R.id.txtsign_up);
         txtForgetPassword = findViewById(R.id.txtforget);
-        POI = findViewById(R.id.btn_poi);
 
 
     }
@@ -368,16 +392,18 @@ public class MainActivity extends AppCompatActivity {
 
         String email = mEmailLayout.getEditText().getText().toString().trim();
         mEmailLayout.getEditText().getBackground().clearColorFilter();
-        ;
 
         if (email.isEmpty()) {
-            mEmailLayout.setError("Email is required. Can't be empty.");
+            mEmailLayout.setHint("Email is required. Can't be empty.");
+            mEmailLayout.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+
             return false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            mEmailLayout.setError("Invalid Email. Enter valid email address.");
+            mEmailLayout.setHint("Invalid Email. Enter valid email address.");
+            mEmailLayout.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+
             return false;
         } else {
-            mEmailLayout.setError(null);
             return true;
         }
     }
@@ -385,12 +411,14 @@ public class MainActivity extends AppCompatActivity {
     private boolean validatePassword() {
 
         String password = mPasswordLayout.getEditText().getText().toString().trim();
+        mPasswordLayout.getEditText().getBackground().clearColorFilter();
 
         if (password.isEmpty()) {
-            mPasswordLayout.setError("Password is required. Can't be empty.");
+            mPasswordLayout.setHint("Password is required. Can't be empty.");
+            mPasswordLayout.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+
             return false;
         } else {
-            mPasswordLayout.setError(null);
             return true;
         }
     }

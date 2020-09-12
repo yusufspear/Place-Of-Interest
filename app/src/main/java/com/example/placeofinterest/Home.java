@@ -5,19 +5,24 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.hardware.usb.UsbDevice;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -57,6 +62,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -92,6 +98,8 @@ import com.google.maps.model.Duration;
 import com.google.maps.model.TravelMode;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -117,7 +125,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     private NavigationView navigationView;
     private Toolbar toolbar;
     FloatingActionButton mCurrentLocation, mDirection;
-    FrameLayout frameLayout,MapView;
+    FrameLayout frameLayout, MapView;
     Button rest, atm, hotel, school;
     private static String TAG = "TAG";
     BottomNavigationView bottomNavigationView;
@@ -163,17 +171,29 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate: CALLED");
-        MarkerPoints = new ArrayList<>(2);
-//        doorView  = getWindow().getDecorView();
-////        d.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.TYPE_STATUS_BAR);
-////        d.setFlags(WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION,WindowManager.LayoutParams.TYPE_STATUS_BAR);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            doorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
-//        }
         hideSystemUI();
         mAuth = FirebaseAuth.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
         mDataRef = FirebaseDatabase.getInstance().getReference("User");
+
+
+        mDataRef.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user1 = snapshot.getValue(User.class);
+                String isNew = user1.getisnew();
+                if (isNew.equals("true")) {
+                    startActivity(new Intent(getApplicationContext(), Select_POI.class));
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        MarkerPoints = new ArrayList<>(2);
         isCurrentLocation();
 
         setContentView(R.layout.activity_home);
@@ -206,13 +226,14 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         bottomFragment = new BottomFragment();
         b1 = new Bundle();
         b2 = new Bundle();
-        Intent intent=getIntent();
-        if (intent.getStringExtra("placeId")!=null){
-            String placeId=intent.getStringExtra("placeId");
-            Log.i(TAG, "onCreate: Call Susscss. Place ID"+ placeId);
+        Intent intent = getIntent();
+        if (intent.getStringExtra("placeId") != null) {
+            String placeId = intent.getStringExtra("placeId");
+            Log.i(TAG, "onCreate: Call Susscss. Place ID" + placeId);
             directionCallByPOI(placeId);
         }
-//        setSupportActionBar(toolbar);
+
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
@@ -234,10 +255,9 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 String text = autocompleteSupportFragment.getText(autocompleteSupportFragment.getId()).toString();
-                Toast.makeText(Home.this, text, LENGTH_LONG).show();
                 Log.i(TAG, "PlaceText: " + text);
                 mMap.clear();
-                Toast.makeText(Home.this, "Place: " + place.getName() + ", " + place.getId(), LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Place: " + place.getName(), LENGTH_LONG).show();
                 if (place.getLatLng() != null) {
                     if (!b1.isEmpty()) {
                         b1.remove("destination");
@@ -297,7 +317,9 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                     CurrentLocation_Long = address.getLongitude();
 //                    Toast.makeText(Home.this,"Lat:- " +address.getLatitude()+"\n Long:- "+address.getLongitude(), LENGTH_LONG).show();
                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-//                    MarkerPoints.add(0,latLng);
+                    MarkerPoints.add(0, latLng);
+//                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
+//                    mMap.animateCamera(cameraUpdate);
 
                     Log.i("loc", "onLocationResult: Execute" + latLng);
 
@@ -306,95 +328,6 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
             }
         };
 
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String s) {
-//                String address= searchView.getQuery().toString().trim();
-//                if (address!=null ){
-//                    Geocoder geocoder = new Geocoder(Home.this, Locale.ENGLISH);
-//                    try {
-//                        List<Address>  addressList=geocoder.getFromLocationName(address,10);
-//
-//                        if (addressList.size()>0){
-//
-//                            Address location=addressList.get(0);
-//                            LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
-////                            showMarker(latLng);
-//                            mMap.addMarker(new MarkerOptions().title(s).position(latLng).icon(bitmapDescriptorFromVector(getApplicationContext(),R.drawable.ic_custom_marker_black_24dp)));
-//                            CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(latLng,19);
-//                            mMap.animateCamera(cameraUpdate, 1000, new GoogleMap.CancelableCallback() {
-//                                @Override
-//                                public void onFinish() {
-////                        Toast.makeText(Home.this, "Finished", Toast.LENGTH_SHORT).show();
-//                                }
-//
-//                                @Override
-//                                public void onCancel() {
-////                        Toast.makeText(Home.this, "Cancelled", Toast.LENGTH_SHORT).show();
-//
-//                                }
-//                            });
-//                        }
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//
-//                return false;
-//            }
-//
-//            private BitmapDescriptor bitmapDescriptorFromVector(Context applicationContext, int ic_custom_marker_black_24dp) {
-//                Drawable vectorDrawable = ContextCompat.getDrawable(applicationContext,ic_custom_marker_black_24dp);
-//                Objects.requireNonNull(vectorDrawable).setBounds(0,0,vectorDrawable.getIntrinsicWidth(),vectorDrawable.getIntrinsicHeight());
-//                Bitmap.Config config;
-//                Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-//                Canvas canvas = new Canvas(bitmap);
-//                vectorDrawable.draw(canvas);
-//                return BitmapDescriptorFactory.fromBitmap(bitmap);            }
-//
-//
-//            @Override
-//            public boolean onQueryTextChange(String s) {
-//                return false;
-//            }
-//        });
-//        searchView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                searchView.setVisibility(View.INVISIBLE);
-//
-//            }
-//        });
-
-
-//        bottomNavigationView.setSelectedItemId(R.id.home);
-//        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-//                switch (menuItem.getItemId()){
-//
-//                    case R.id.home:
-//                        return true;
-//
-//                    case R.id.search:
-//                        startActivity(new Intent(Home.this, Search.class));
-//                        overridePendingTransition(0,0);
-//                        return true;
-//
-//                    case R.id.history:
-//                        startActivity(new Intent(Home.this, History.class));
-//                        overridePendingTransition(0,0);
-//                        return true;
-//
-//                    case R.id.profile:
-//                        startActivity(new Intent(Home.this, Profile.class));
-//                        overridePendingTransition(0,0);
-//                        return true;
-//                }
-//                return false;
-//            }
-//        });
 
         chipNavigationBar.setItemSelected(chip_home, true);
         chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
@@ -427,6 +360,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
 
     }
+
 
     private void menuPress(View view) {
         drawerLayout.openDrawer(GravityCompat.START);
@@ -467,7 +401,9 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                         CurrentLocation_Lat = dataSnapshot.child("Latitude").getValue(Double.class);
                         CurrentLocation_Long = dataSnapshot.child("Longitude").getValue(Double.class);
                         MarkerPoints.add(0, new LatLng(CurrentLocation_Lat, CurrentLocation_Long));
-                        Log.i(TAG, "onDataChange: Execute");
+                        Log.i(TAG, "onDataChange: Execute" + CurrentLocation_Lat + CurrentLocation_Long);
+                        LatLng latLng = new LatLng(CurrentLocation_Lat, CurrentLocation_Long);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
                     }
 
                     @Override
@@ -477,26 +413,12 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                 });
     }
 
-//    @Override
-//    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-//        savedInstanceState.putDouble("lat", CurrentLocation_Lat);
-//        savedInstanceState.putDouble("long", CurrentLocation_Long);
-//        super.onSaveInstanceState(savedInstanceState);
-//    }
-//
-//    @Override
-//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        CurrentLocation_Lat=savedInstanceState.getDouble("lat");
-//        CurrentLocation_Long=savedInstanceState.getDouble("long");
-//    }
-
 
     private String getUrl(double latitude, double longitude, String nearbyPlace, String type) {
 
         StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlaceUrl.append("location=" + latitude + "," + longitude);
-        googlePlaceUrl.append("&radius=" + 2000);
+        googlePlaceUrl.append("&radius=" + 500);
         googlePlaceUrl.append("&keyword=" + nearbyPlace);
         googlePlaceUrl.append("&sensor=true");
         googlePlaceUrl.append("&key=" + apiKey_nearByPlace);
@@ -509,6 +431,16 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
         if (isGPSEnabled()) {
 
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             mLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
 
                 @Override
@@ -518,19 +450,11 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                         Location address = task.getResult();
                         mMap.animateCamera(CameraUpdateFactory.zoomTo(3.0f));
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        MarkerPoints.add(0, latLng);
+//                        MarkerPoints.add(0, latLng);
                         deviceCurrentLocation = address;
 
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
-                        mMap.animateCamera(cameraUpdate, 1000, new GoogleMap.CancelableCallback() {
-                            @Override
-                            public void onFinish() {
-                            }
-
-                            @Override
-                            public void onCancel() {
-                            }
-                        });
+                        mMap.animateCamera(cameraUpdate);
 
                     } else {
                         Log.i("Task ", "onComplete: Not Execute");
@@ -586,47 +510,10 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
             }
         }
 
-//        if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
-//            if (resultCode == RESULT_OK) {
-//                Place place = Autocomplete.getPlaceFromIntent(data);
-//                mMap.clear();
-//
-//                Toast.makeText(Home.this,"Place: " + place.getName() + ", " + place.getId(), LENGTH_LONG).show();
-//                if (place.getLatLng()!=null){
-//                    Log.i(TAG, "Place: " + place.getName());
-//
-//                    LatLng address = place.getLatLng();
-//                    mMap.animateCamera(CameraUpdateFactory.zoomTo(4.0f));
-//                    Marker marker =mMap.addMarker(new MarkerOptions().position(address).title(place.getName())
-//                            .snippet(  "ADDRESS:  "+place.getAddress() +"\nRATING: "+place.getRating()+"\nCONTACT: "+place.getPhoneNumber()));
-//                    marker.hideInfoWindow();
-//                    mMap.setInfoWindowAdapter(new CustomInfoWindow_Adapter(Home.this));
-//                    CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(address,18);
-//                    mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
-//                        @Override
-//                        public void onFinish() {
-//                        }
-//
-//                        @Override
-//                        public void onCancel() {
-//                        }
-//                    });
-//                }                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
-//                Toast.makeText(Home.this, "Working Fine", LENGTH_LONG).show();
-//
-//            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-//                // TODO: Handle the error.
-//                Status status = Autocomplete.getStatusFromIntent(data);
-//                Log.i(TAG, status.getStatusMessage());
-//            } else if (resultCode == RESULT_CANCELED) {
-//                // The user canceled the operation.
-//            }
-//        }
     }
 
     private void initViews() {
 
-//        bottomNavigationView=findViewById(R.id.chip_navigation_bar);
         mCurrentLocation = findViewById(R.id.fab_myLocation);
         mDirection = findViewById(R.id.fab_direction);
         rest = findViewById(R.id.restaurant);
@@ -642,12 +529,14 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         horizontalScrollView = findViewById(R.id.scrollable_linearLayout);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
         Log.d("Map", "IT is Ready");
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setBuildingsEnabled(true);
@@ -664,7 +553,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                     locationCompass.getLayoutParams();
             // position on right bottom
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-            layoutParams.setMargins(200, 400,500, 100);
+            layoutParams.setMargins(200, 400, 500, 100);
         }
         mMap.setInfoWindowAdapter(new CustomInfoWindow_Adapter(Home.this));
         LatLng latLng = new LatLng(CurrentLocation_Lat, CurrentLocation_Long);
@@ -913,6 +802,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     }
 
 
+    @SuppressLint("MissingPermission")
     private void LocationUpdate() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -931,32 +821,6 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         GetNearbyPlacesDataog getNearbyPlacesDataog = new GetNearbyPlacesDataog(mContext);
 
         switch (v.getId()) {
-//            case R.id.btnHospitals: {
-//
-//                mMap.clear();
-//                String Hospital = "hospital";
-//                String url = getUrl(latitude, longitude, Hospital);
-//
-//                dataTransfer[0] = mMap;
-//                dataTransfer[1] = url;
-//
-//                getNearbyPlacesData.execute(dataTransfer);
-//                Toast.makeText(MapsActivity2.this, "Showing Nearby Hospitals", Toast.LENGTH_SHORT).show();
-//                break;
-//            }
-//            case R.id.btnBanks: {
-//
-//                mMap.clear();
-//                String Bank = "bank";
-//                String url = getUrl(latitude, longitude, Bank);
-//
-//                dataTransfer[0] = mMap;
-//                dataTransfer[1] = url;
-//
-//                getNearbyPlacesData.execute(dataTransfer);
-//                Toast.makeText(MapsActivity2.this, "Showing Nearby Banks", Toast.LENGTH_SHORT).show();
-//                break;
-//            }
             case R.id.restaurant: {
                 mMap.clear();
                 String search = "restaurant";
@@ -1095,7 +959,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
     public void directionCallByPOI(String destinationID) {
 
-        Log.i(TAG, "directionCallByPOI: "+destinationID );
+        Log.i(TAG, "directionCallByPOI: " + destinationID);
         String placeId = destinationID;
         List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS,
                 Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.RATING, Place.Field.USER_RATINGS_TOTAL);
@@ -1104,10 +968,10 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         Log.i(TAG, "directionCallByPOI: PLace Init");
         placesClient.fetchPlace(request).addOnSuccessListener((fetchPlaceResponse) -> {
             Place place = fetchPlaceResponse.getPlace();
-            LatLng location =place.getLatLng();
-            String name=place.getName();
-            Log.i(TAG, "Place found: " + place.getName()+"Location"+location);
-            MarkerPoints.add(1,location);
+            LatLng location = place.getLatLng();
+            String name = place.getName();
+            Log.i(TAG, "Place found: " + place.getName() + "Location" + location);
+            MarkerPoints.add(1, location);
             b1.putString("destination", name);
             Marker marker = null;
             marker = mMap.addMarker(new MarkerOptions().position(location).title(place.getName())
@@ -1115,7 +979,6 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                             + "\nCONTACT: " + place.getPhoneNumber() + "\nWEBSITE: " + place.getWebsiteUri()));
             marker.hideInfoWindow();
             direction(mDirection);
-
 
 
         }).addOnFailureListener((exception) -> {
@@ -1169,7 +1032,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         // Getting URL to the Google Directions API
         origin = MarkerPoints.get(0);
         destination = MarkerPoints.get(1);
-        Log.i(TAG, "direction: " + MarkerPoints.get(0) + MarkerPoints.get(1));
+        Log.i(TAG, "directionFinal: " + MarkerPoints.get(0) + MarkerPoints.get(1));
+        Log.i(TAG, "directionFinal: " + origin + destination);
         calculateDirections(origin, destination);
         b2.putDouble("Lat_source", origin.latitude);
         b2.putDouble("Lang_source", origin.longitude);
@@ -1192,6 +1056,13 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         bottomFragment.setArguments(b2);
         hideBackground();
         transaction.commit();
+        LatLngBounds.Builder bounds = new LatLngBounds.Builder();
+
+        bounds.include(origin);
+        bounds.include(destination);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 50));
+
+
 
     }
 
@@ -1228,6 +1099,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "onResume: ");
+
         if (CurrentLocation_Lat != 0) {
 
             Log.i(TAG, "onResume: IF Excuted " + CurrentLocation_Lat + CurrentLocation_Long);

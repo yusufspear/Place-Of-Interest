@@ -13,7 +13,7 @@
     <Button
         android:id="@+id/btn_back"
         android:layout_width="90dp"
-        android:layout_height="45dp"
+        android:layout_height="40dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/btnsignin"
@@ -22,8 +22,8 @@
         android:paddingEnd="13dp"
         android:text="@string/back"
         android:textAlignment="textEnd"
-        android:textColor="@color/colorBlack"
-        android:textStyle="italic"
+        android:textColor="@android:color/background_dark"
+        android:textStyle="normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,15 +32,16 @@
         android:layout_width="169dp"
         android:layout_height="31dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="64dp"
         android:layout_marginEnd="16dp"
+        android:fontFamily="cursive"
         android:text="@string/welcome_to"
         android:textAlignment="center"
         android:textColor="@color/colorWhite"
         android:textSize="30sp"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.93"
+        app:layout_constraintHorizontal_bias="0.98"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -49,6 +50,7 @@
         android:layout_width="194dp"
         android:layout_height="59dp"
         android:layout_marginTop="16dp"
+        android:fontFamily="cursive"
         android:text="@string/register"
         android:textAlignment="center"
         android:textColor="@color/colorWhite"
@@ -73,7 +75,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:background="@drawable/textfield"
             android:drawablePadding="10dp"
             android:hint="@string/enter_full_name"
@@ -100,7 +102,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:background="@drawable/textfield"
             android:drawablePadding="10dp"
             android:hint="@string/enter_email"
@@ -129,7 +131,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:background="@drawable/textfield"
             android:drawablePadding="10dp"
             android:hint="@string/enter_password"
@@ -158,7 +160,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:background="@drawable/textfield"
             android:drawablePadding="10dp"
             android:hint="@string/re_enter_password"
@@ -186,7 +188,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:background="@drawable/textfield"
             android:drawablePadding="10dp"
             android:hint="@string/enter_phone_number"

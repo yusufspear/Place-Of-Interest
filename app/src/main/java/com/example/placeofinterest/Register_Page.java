@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
@@ -24,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class Register_Page extends AppCompatActivity {
@@ -90,8 +93,51 @@ public class Register_Page extends AppCompatActivity {
             gender = "FeMale";
 
         }
-//        String Uid= mAuth.getUid();
+        Objects.requireNonNull(Email.getEditText()).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String hint = Objects.requireNonNull(Email.getHint()).toString();
+                if (hint.equals("Email is required. Can't be empty.")){
+                    Email.setHint("Invalid Email. Enter valid email address.");
+
+                }else if (hint.equals("Invalid Email. Enter valid email address.")){
+                    Email.setHint("Enter Email");
+                    Email.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#000000")));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        Objects.requireNonNull(Password.getEditText()).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                String hint= Objects.requireNonNull(Password.getHint()).toString();
+                if (hint.equals("Password is required. Can't be empty.")){
+                    Password.setHint("Enter Password");
+                    Password.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#000000")));
+
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         if (!validateEmailAddress() | !validatePassword() | !validateName() | !validatePhoneNumber()) {
             // Email or Password not valid,
@@ -101,9 +147,7 @@ public class Register_Page extends AppCompatActivity {
 
         if (!password.equals(repassword)) {
             Toast.makeText(this, "Password NOT Match", Toast.LENGTH_LONG).show();
-            Repassword.setError("Password Not Match!");
         } else {
-            Repassword.setError(null);
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -120,6 +164,9 @@ public class Register_Page extends AppCompatActivity {
 
                                                                            User user = new User(fullName, email, password, phoneNumber, gender,isNew);
                                                                            mRef.child(mAuth.getCurrentUser().getUid()).setValue(user);
+                                                                           double currentLocation=0.0;
+                                                                           mRef.child(mAuth.getCurrentUser().getUid()).child("Location").child("lastLocation").child("Latitude").setValue(currentLocation);
+                                                                           mRef.child(mAuth.getCurrentUser().getUid()).child("Location").child("lastLocation").child("Longitude").setValue(currentLocation);
                                                                            Toast.makeText(Register_Page.this, "User Created Successfully\n Waiting For Authentication ", Toast.LENGTH_LONG).show();
                                                                            startActivity(new Intent(Register_Page.this, MainActivity.class));
                                                                            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -164,18 +211,19 @@ public class Register_Page extends AppCompatActivity {
     private boolean validateEmailAddress() {
 
         String email = Email.getEditText().getText().toString().trim();
+        Email.getEditText().getBackground().clearColorFilter();
 
         if (email.isEmpty()) {
-            Email.setError("Email is required. Can't be empty.");
-            Email.setErrorTextColor(ColorStateList.valueOf(Color.parseColor("#FF3426")));
+            Email.setHint("Email is required. Can't be empty.");
+            Email.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+
             return false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Email.setError("Invalid Email. Enter valid email address.");
-            Email.setErrorTextColor(ColorStateList.valueOf(Color.parseColor("#FF3426")));
+            Email.setHint("Invalid Email. Enter valid email address.");
+            Email.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
 
             return false;
         } else {
-            Email.setError(null);
             return true;
         }
     }
@@ -183,19 +231,16 @@ public class Register_Page extends AppCompatActivity {
     private boolean validatePassword() {
 
         String password = Password.getEditText().getText().toString().trim();
+        Password.getEditText().getBackground().clearColorFilter();
+
         if (password.isEmpty()) {
-            Password.setError("Password is required. Can't be empty.");
-            Password.setErrorTextColor(ColorStateList.valueOf(Color.parseColor("#FF3426")));
-            return false;
-        } else if (password.length() < 6) {
-            Password.setError("Password is Week Ablest 6 Digit Require");
-            Password.setErrorTextColor(ColorStateList.valueOf(Color.parseColor("#FF3426")));
+            Password.setHint("Password is required. Can't be empty.");
+            Password.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+
             return false;
         } else {
-            Password.setError(null);
             return true;
         }
-
     }
 
 
@@ -204,14 +249,15 @@ public class Register_Page extends AppCompatActivity {
         String fullName = FullName.getEditText().getText().toString().trim();
 
         if (fullName.isEmpty()) {
-            FullName.setError("Name Field Can't be empty!");
+            FullName.setHint("Name Field Can't be empty!");
+            PhoneNumber.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+
             return false;
         } else if (fullName.length() < 5) {
-            FullName.setError("Name is Too Short!");
-            FullName.setErrorTextColor(ColorStateList.valueOf(Color.parseColor("#FF3426")));
+            FullName.setHint("Name is Too Short!");
+            FullName.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
             return true;
         } else {
-            FullName.setError(null);
             return true;
         }
 
@@ -222,15 +268,16 @@ public class Register_Page extends AppCompatActivity {
         String phoneNumber = PhoneNumber.getEditText().getText().toString().trim();
 
         if (phoneNumber.isEmpty()) {
-            PhoneNumber.setError("PhoneNumber is required");
+            PhoneNumber.setHint("PhoneNumber is required");
+            PhoneNumber.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+
             return false;
         } else if (phoneNumber.length() < 10) {
-            PhoneNumber.setError("10 Digit Required!");
-            PhoneNumber.setErrorTextColor(ColorStateList.valueOf(Color.parseColor("#FF3426")));
+            PhoneNumber.setHint("10 Digit Required!");
+            PhoneNumber.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
 
             return false;
         } else {
-            PhoneNumber.setError(null);
             return true;
         }
     }

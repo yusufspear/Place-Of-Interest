@@ -17,28 +17,30 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView_gym"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
             android:checkable="true"
             android:clickable="true"
             android:focusable="true"
             app:cardBackgroundColor="@color/colorWhite"
             app:cardCornerRadius="10dp"
             app:cardElevation="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/cardView_mall"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="PrivateResource,UnusedAttribute">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/img_gym"
-                    android:layout_width="@dimen/poi_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/poi_height"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@string/select_POI"
@@ -65,9 +67,10 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView_mall"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             app:cardBackgroundColor="@color/colorWhite"
@@ -75,6 +78,7 @@
             app:cardElevation="10dp"
             app:cardPreventCornerOverlap="false"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cardView_gym"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="UnusedAttribute">
 
@@ -85,7 +89,7 @@
 
                 <ImageView
                     android:id="@+id/img_mall"
-                    android:layout_width="@dimen/poi_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/poi_height"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@string/select_POI"
@@ -112,14 +116,16 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView_park"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
             app:cardBackgroundColor="@color/colorWhite"
             app:cardCornerRadius="10dp"
             app:cardElevation="5dp"
+            app:layout_constraintEnd_toStartOf="@+id/cardView_music_venues"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardView_gym"
             tools:ignore="UnusedAttribute">
@@ -131,7 +137,7 @@
 
                 <ImageView
                     android:id="@+id/img_park"
-                    android:layout_width="@dimen/poi_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/poi_height"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@string/select_POI"
@@ -158,15 +164,17 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView_music_venues"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
             app:cardBackgroundColor="@color/colorWhite"
             app:cardCornerRadius="10dp"
             app:cardElevation="10dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cardView_park"
             app:layout_constraintTop_toBottomOf="@+id/cardView_mall"
             tools:ignore="UnusedAttribute">
 
@@ -177,7 +185,7 @@
 
                 <ImageView
                     android:id="@+id/img_music_venues"
-                    android:layout_width="@dimen/poi_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/poi_height"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@string/select_POI"
@@ -204,15 +212,17 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView_restaurant"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
             app:cardBackgroundColor="@color/colorWhite"
             app:cardCornerRadius="10dp"
             app:cardElevation="10dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cardView_hotel"
             app:layout_constraintTop_toBottomOf="@+id/cardView_music_venues"
             app:strokeColor="@color/pureGray"
             tools:ignore="UnusedAttribute">
@@ -224,7 +234,7 @@
 
                 <ImageView
                     android:id="@+id/img_restaurant"
-                    android:layout_width="@dimen/poi_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/poi_height"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@string/select_POI"
@@ -251,14 +261,16 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView_hotel"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
             app:cardBackgroundColor="@color/colorWhite"
             app:cardCornerRadius="10dp"
             app:cardElevation="10dp"
+            app:layout_constraintEnd_toStartOf="@+id/cardView_restaurant"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardView_park"
             tools:ignore="UnusedAttribute">
@@ -270,7 +282,7 @@
 
                 <ImageView
                     android:id="@+id/img_hotel"
-                    android:layout_width="@dimen/poi_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/poi_height"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@string/select_POI"
@@ -297,14 +309,14 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView_cinema"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             app:cardBackgroundColor="@color/colorWhite"
             app:cardCornerRadius="10dp"
             app:cardElevation="10dp"
+            app:layout_constraintEnd_toEndOf="@+id/cardView_hotel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardView_hotel"
             tools:ignore="UnusedAttribute">
@@ -316,7 +328,7 @@
 
                 <ImageView
                     android:id="@+id/img_cinema"
-                    android:layout_width="@dimen/poi_width"
+                    android:layout_width="match_parent"
                     android:layout_height="@dimen/poi_height"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@string/select_POI"

@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +20,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+
+import java.util.Objects;
 
 public class ForgetPassword extends AppCompatActivity {
 
@@ -32,7 +36,34 @@ public class ForgetPassword extends AppCompatActivity {
         setContentView(R.layout.activity_forget_password);
         mAuth=FirebaseAuth.getInstance();
         initViews();
+        Objects.requireNonNull(mForgetPassword.getEditText()).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String hint = Objects.requireNonNull(mForgetPassword.getHint()).toString();
+                if (hint.equals("Email is required. Can't be empty.")){
+                    mForgetPassword.setHint("Invalid Email. Enter valid email address.");
+
+                }else if (hint.equals("Invalid Email. Enter valid email address.")){
+                    mForgetPassword.setHint("Enter Email");
+                    mForgetPassword.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#000000")));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+
+            }
+        });
+
         Reset.setOnClickListener(this::forgetPassword);
+
     }
 
 
@@ -98,17 +129,19 @@ public class ForgetPassword extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_forgetPassword);
     }
 
+
     private boolean validateEmailAddress() {
 
         String email = mForgetPassword.getEditText().getText().toString().trim();
 
         if (email.isEmpty()) {
-            mForgetPassword.setError("Email is required. Can't be empty.");
-            mForgetPassword.setErrorTextColor(ColorStateList.valueOf(Color.parseColor("#FF3426")));
+            mForgetPassword.setHint("Email is required. Can't be empty.");
+            mForgetPassword.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+
             return false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            mForgetPassword.setError("Invalid Email. Enter valid email address.");
-            mForgetPassword.setErrorTextColor(ColorStateList.valueOf(Color.parseColor("#FF3426")));
+            mForgetPassword.setHint("Invalid Email. Enter valid email address.");
+            mForgetPassword.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
 
             return false;
         } else {

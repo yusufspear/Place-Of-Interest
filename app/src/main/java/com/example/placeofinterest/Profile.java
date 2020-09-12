@@ -123,9 +123,11 @@ public class Profile extends AppCompatActivity {
                 User user = dataSnapshot.getValue(User.class);
                 New[0] = dataSnapshot.child("username").getValue(String.class);
                 New[1] = dataSnapshot.child("isnew").getValue(String.class);
-
-                Log.i("List", "onDataChange: Execute");
-                mOutputText.setText(New[1]);
+//
+//                Log.i("List", "onDataChange: Execute");
+//                mOutputText.setText(New[1]);
+                assert user != null;
+                mOutputText.setText(user.getisnew());
             }
 
             @Override
