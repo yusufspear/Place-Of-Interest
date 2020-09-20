@@ -1,5 +1,9 @@
 package com.example.placeofinterest.adapter;
 
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.placeofinterest.POIAdapter;
 import com.example.placeofinterest.R;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
@@ -25,11 +32,11 @@ public class historyAdapter extends RecyclerView.Adapter<historyAdapter.HistoryV
 
     private List<String> destTitle = new ArrayList<>();
     private List<URL> destUrl = new ArrayList<>();
-    private List<Time> searchTime = new ArrayList<>();
+    private List<String> searchTime = new ArrayList<>();
     private List<String> destPoiType = new ArrayList<>();
     private List<Float> ratingValue = new ArrayList<>();
 
-    public historyAdapter(List<String> destTitle, List<URL> destUrl, List<Time> searchTime, List<String> destPoiType, List<Float> ratingValue) {
+    public historyAdapter(List<String> destTitle, List<URL> destUrl, List<String> searchTime, List<String> destPoiType, List<Float> ratingValue) {
         this.destTitle = destTitle;
         this.destUrl = destUrl;
         this.searchTime = searchTime;
@@ -45,11 +52,14 @@ public class historyAdapter extends RecyclerView.Adapter<historyAdapter.HistoryV
     }
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull HistoryView holder, int position) {
 
         holder.destination_title.setText(destTitle.get(position));
         holder.ratingBar.setRating(ratingValue.get(position));
+        holder.destination_poi_type.setText(destPoiType.get(position));
+        holder.destination_time.setText(searchTime.get(position));
 
     }
 

@@ -43,6 +43,7 @@ import com.theartofdev.edmodo.cropper.CropImageView.CropShape;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import static com.example.placeofinterest.R.id.chip_history;
 import static com.example.placeofinterest.R.id.chip_home;
 import static com.example.placeofinterest.R.id.chip_profile;
 
@@ -104,7 +105,6 @@ public class Profile extends AppCompatActivity {
                         startActivity(new Intent(Profile.this, History.class));
                         overridePendingTransition(0,0);
                         finish();
-
                         break;
 
                 }
@@ -127,7 +127,7 @@ public class Profile extends AppCompatActivity {
 //                Log.i("List", "onDataChange: Execute");
 //                mOutputText.setText(New[1]);
                 assert user != null;
-                mOutputText.setText(user.getisnew());
+                mOutputText.setText(user.getUsername());
             }
 
             @Override
@@ -373,5 +373,8 @@ private void getDownloadUrl(StorageReference reference) {
 
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 }

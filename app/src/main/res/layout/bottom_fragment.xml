@@ -50,7 +50,9 @@
                 android:layout_marginEnd="10dp"
                 android:text="Distance :"
                 android:textColor="@color/colorBlack"
-                android:textSize="26sp"
+                android:textSize="20sp"
+                android:textStyle="bold|normal"
+                android:gravity="center_vertical"
                 app:layout_constraintBottom_toBottomOf="@+id/deviceTime"
                 app:layout_constraintEnd_toStartOf="@+id/deviceTime"
                 app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +66,9 @@
                 android:layout_marginStart="24dp"
                 android:text="Time :"
                 android:textColor="@color/colorBlack"
-                android:textSize="30sp"
+                android:textSize="22sp"
+                android:textStyle="bold|normal"
+                android:gravity="center_vertical"
                 app:layout_constraintBottom_toBottomOf="@+id/spinner_mode"
                 app:layout_constraintEnd_toStartOf="@+id/spinner_mode"
                 app:layout_constraintStart_toStartOf="parent"
@@ -79,13 +83,16 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:entries="@array/mode_list"
-                android:popupBackground="@color/colorWhite"
+                android:gravity="center_vertical"
+                android:pointerIcon="context_menu"
+                android:popupBackground="@android:color/primary_text_dark_nodisable"
+                android:popupElevation="@dimen/corner_radius_default"
                 app:layout_constraintBottom_toTopOf="@+id/deviceTime"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toEndOf="@+id/arriving_Time"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintVertical_bias="0.0" tools:targetApi="n" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

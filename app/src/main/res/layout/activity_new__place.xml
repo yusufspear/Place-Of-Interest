@@ -39,7 +39,7 @@
         android:padding="5dp"
         android:paddingStart="20dp"
         android:paddingEnd="0dp"
-        android:text="Source: Your Location "
+        android:text="Source: Current Location"
         android:textColor="@color/common_google_signin_btn_text_light_pressed"
         android:textSize="18sp"
         android:textStyle="normal|italic"
@@ -119,19 +119,20 @@
     </androidx.cardview.widget.CardView>
 
 
-    <ListView
+    <GridView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:numColumns="2"
+
         android:choiceMode="multipleChoice"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/select_poi"
-        app:layout_constraintVertical_bias="0.0"
-        tools:ignore="NestedScrolling" />
+        app:layout_constraintVertical_bias="0.0"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabConfirm"

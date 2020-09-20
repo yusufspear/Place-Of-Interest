@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Toast;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -73,9 +74,6 @@ public class Register_Page extends AppCompatActivity {
         Backbtn = findViewById(R.id.btn_back);
     }
 
-
-    // Read from the database
-
     private void createUser(View view) {
 
 
@@ -85,7 +83,7 @@ public class Register_Page extends AppCompatActivity {
         String email = Objects.requireNonNull(Email.getEditText()).getText().toString().trim();
         String password = Objects.requireNonNull(Password.getEditText()).getText().toString().trim();
         String repassword = Objects.requireNonNull(Repassword.getEditText()).getText().toString().trim();
-        String isNew="true";
+        String isNew = "true";
 
         if (GenderM.isChecked()) {
             gender = "Male";
@@ -102,10 +100,10 @@ public class Register_Page extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String hint = Objects.requireNonNull(Email.getHint()).toString();
-                if (hint.equals("Email is required. Can't be empty.")){
+                if (hint.equals("Email is required. Can't be empty.")) {
                     Email.setHint("Invalid Email. Enter valid email address.");
 
-                }else if (hint.equals("Invalid Email. Enter valid email address.")){
+                } else if (hint.equals("Invalid Email. Enter valid email address.")) {
                     Email.setHint("Enter Email");
                     Email.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#000000")));
                 }
@@ -125,8 +123,8 @@ public class Register_Page extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                String hint= Objects.requireNonNull(Password.getHint()).toString();
-                if (hint.equals("Password is required. Can't be empty.")){
+                String hint = Objects.requireNonNull(Password.getHint()).toString();
+                if (hint.equals("Password is required. Can't be empty.")) {
                     Password.setHint("Enter Password");
                     Password.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#000000")));
 
@@ -160,11 +158,11 @@ public class Register_Page extends AppCompatActivity {
                                                                    public void onComplete(@NonNull Task<Void> task) {
                                                                        if (task.isSuccessful()) {
 
-                                                                           getValues(fullName, email, password, phoneNumber, gender,isNew);
+                                                                           getValues(fullName, email, password, phoneNumber, gender, isNew);
 
-                                                                           User user = new User(fullName, email, password, phoneNumber, gender,isNew);
+                                                                           User user = new User(fullName, email, password, phoneNumber, gender, isNew);
                                                                            mRef.child(mAuth.getCurrentUser().getUid()).setValue(user);
-                                                                           double currentLocation=0.0;
+                                                                           double currentLocation = 0.0;
                                                                            mRef.child(mAuth.getCurrentUser().getUid()).child("Location").child("lastLocation").child("Latitude").setValue(currentLocation);
                                                                            mRef.child(mAuth.getCurrentUser().getUid()).child("Location").child("lastLocation").child("Longitude").setValue(currentLocation);
                                                                            Toast.makeText(Register_Page.this, "User Created Successfully\n Waiting For Authentication ", Toast.LENGTH_LONG).show();
@@ -285,9 +283,9 @@ public class Register_Page extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Intent i=new Intent(this,MainActivity.class);
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
-        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         finish();
     }
 

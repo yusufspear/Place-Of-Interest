@@ -324,58 +324,12 @@ public class MainActivity extends AppCompatActivity {
         if (user != null && mAuth.getCurrentUser().isEmailVerified()) {
 
                 startActivity(new Intent(this, Home.class));
+                finish();
 
         }
 
 
     }
-
-//    private void createUser(View view) {
-//
-//        if (!validateEmailAddress() | !validatePassword()) {
-//            // Email or Password not valid,
-//            return;
-//        }
-//        //Email and Password valid, create user here
-//
-//        String email=mEmailLayout.getEditText().getText().toString().trim();
-//        String password=mPasswordLayout.getEditText().getText().toString().trim();
-//        showProgressBar();
-//
-//        mAuth.createUserWithEmailAndPassword(email,password)
-//                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()){
-//                            Toast.makeText(MainActivity.this,"User Created Successfully",Toast.LENGTH_SHORT).show();
-//                            hideProgressBar();
-//                            startActivity(new Intent(MainActivity.this,MapsActivity.class));
-//                            //updateUI();
-//                        }else{
-//                            Toast.makeText(MainActivity.this,"Error Occur",Toast.LENGTH_SHORT).show();
-//                            hideProgressBar();
-//                        }
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        hideProgressBar();
-//                        if (e instanceof FirebaseAuthUserCollisionException){
-//                            Toast.makeText(MainActivity.this,"Email Already in Database",Toast.LENGTH_SHORT).show();
-//                            mOutputText.setText("Email Already in Database");
-//                        }
-//                    }
-//                });
-//
-//
-//    }
-//
-//    private void signOutUser(View view){
-//        mAuth.signOut();
-//        //updateUI();
-//
-//    }
 
     private void initViews(){
         mEmailLayout = findViewById(R.id.et_email);
@@ -394,12 +348,12 @@ public class MainActivity extends AppCompatActivity {
         mEmailLayout.getEditText().getBackground().clearColorFilter();
 
         if (email.isEmpty()) {
-            mEmailLayout.setHint("Email is required. Can't be empty.");
+            mEmailLayout.setHint("Email is required.");
             mEmailLayout.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
 
             return false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            mEmailLayout.setHint("Invalid Email. Enter valid email address.");
+            mEmailLayout.setHint("Invalid Email.");
             mEmailLayout.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
 
             return false;
@@ -414,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
         mPasswordLayout.getEditText().getBackground().clearColorFilter();
 
         if (password.isEmpty()) {
-            mPasswordLayout.setHint("Password is required. Can't be empty.");
+            mPasswordLayout.setHint("Password is required.");
             mPasswordLayout.setHintTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
 
             return false;

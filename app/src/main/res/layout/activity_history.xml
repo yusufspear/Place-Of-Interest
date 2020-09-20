@@ -30,7 +30,6 @@
         app:cnb_menuResource="@menu/chip_bottom_nav_bar"
         app:cnb_orientationMode="horizontal"
         app:cnb_unselectedColor="@color/colorBlack"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toRightOf="parent"

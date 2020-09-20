@@ -2,6 +2,7 @@ package com.example.placeofinterest;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -19,12 +20,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.hardware.usb.UsbDevice;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -32,20 +36,24 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.PointerIcon;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
 
+import com.bumptech.glide.Glide;
 import com.example.placeofinterest.module.BottomFragment;
 import com.example.placeofinterest.module.PolylineData;
 import com.example.placeofinterest.module.TopFragment;
+import com.example.placeofinterest.module.deviceLocationUpdate;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -56,7 +64,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnPolylineClickListener;
 import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -68,6 +75,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -86,6 +94,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
@@ -93,18 +103,18 @@ import com.google.maps.errors.ApiException;
 import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
-import com.google.maps.model.Distance;
-import com.google.maps.model.Duration;
 import com.google.maps.model.TravelMode;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
-import org.slf4j.Logger;
-
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import static android.widget.Toast.LENGTH_LONG;
 import static com.example.placeofinterest.R.id.chip_home;
@@ -121,6 +131,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     public static GoogleMap mMap;
     private AutocompleteSupportFragment autocompleteSupportFragment;
     private ImageButton top_left_menu;
+    private ImageView headerImage;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private Toolbar toolbar;
@@ -133,18 +144,16 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     private FusedLocationProviderClient mLocationClient;
     private LocationCallback mLocationCallback;
     HandlerThread handlerThread;
-    private View doorView;
     private String apiKey, apiKey_nearByPlace;
-    private Location deviceCurrentLocation;
+    public LatLng deviceCurrentLocation;
     private SupportMapFragment supportMapFragment;
 
     private static double CurrentLocation_Lat;
     private static double CurrentLocation_Long;
-    private Context mContext;
 
-    private FirebaseAuth mAuth;
     private DatabaseReference mDataRef;
     private FirebaseUser user;
+    private StorageReference mStorageRef;
 
     public ArrayList list_Lat = new ArrayList<Double>();
     public ArrayList list_Long = new ArrayList<Double>();
@@ -160,21 +169,26 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     private CardView CardView_Place_Autocomplete_Fragment;
     private HorizontalScrollView horizontalScrollView;
     private Bundle b1, b2;
-    private String source, place_name;
+    private String source, place_name, place_ID, fromWhich = "Home";
     private int newFragment = 0;
     private Polyline polyline;
     private LatLng origin, destination;
     private PlacesClient placesClient;
-
+    private List<LatLng> newDecodedPath;
+    private List<String> listSelection;
+    private List<com.google.maps.model.LatLng> decodedPath;
+    private deviceLocationUpdate deviceLocationUpdate = new deviceLocationUpdate();
+    private fetchPlaceList fetchPlaceList = new fetchPlaceList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate: CALLED");
         hideSystemUI();
-        mAuth = FirebaseAuth.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
         mDataRef = FirebaseDatabase.getInstance().getReference("User");
+        mStorageRef = FirebaseStorage.getInstance().getReference().child("Profile Image")
+                .child(user.getUid()).child("ProfileImage.jpeg");
 
 
         mDataRef.child(user.getUid()).addValueEventListener(new ValueEventListener() {
@@ -193,8 +207,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
             }
         });
-        MarkerPoints = new ArrayList<>(2);
-        isCurrentLocation();
+
 
         setContentView(R.layout.activity_home);
         GoogleMapOptions options = new GoogleMapOptions()
@@ -208,15 +221,24 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                 .commit();
 
         supportMapFragment.getMapAsync(this);
-
-
+        MarkerPoints = new ArrayList<>(2);
         initViews();
+
+        mStorageRef.getBytes(1024*1024).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap=BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                Log.d("Download Image","1");
+                headerImage.setImageBitmap(bitmap);
+            }
+        });
         apiKey = getString(R.string.google_maps_key);
         apiKey_nearByPlace = getString(R.string.browser_key);
         if (mGeoApiContext == null) {
             mGeoApiContext = new GeoApiContext.Builder().apiKey(apiKey_nearByPlace).build();
         }
 
+        isCurrentLocation();
 
         if (!Places.isInitialized()) {
             Places.initialize(Home.this, apiKey);
@@ -229,10 +251,23 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         Intent intent = getIntent();
         if (intent.getStringExtra("placeId") != null) {
             String placeId = intent.getStringExtra("placeId");
+            fromWhich = intent.getStringExtra("fromWhich");
             Log.i(TAG, "onCreate: Call Susscss. Place ID" + placeId);
-            directionCallByPOI(placeId);
-        }
+            if (fromWhich.equals("New_Place")) {
+                listSelection = new ArrayList<>();
+                listSelection.clear();
+                b1.putString("placeID", placeId);
+                b1.putString("fromWhich", fromWhich);
+                int size = Integer.parseInt(Objects.requireNonNull(intent.getStringExtra("selectListSize")));
+                for (int i = 0; i < size; i++) {
+                    String temp = intent.getStringExtra(String.valueOf(i));
+                    listSelection.add(temp);
+                }
+                fetchPlaceList.setPlaceList(listSelection);
+            }
+            directionCallByPOI(placeId, fromWhich);
 
+        }
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -246,7 +281,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         autocompleteSupportFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         autocompleteSupportFragment.setActivityMode(AutocompleteActivityMode.OVERLAY);
-        autocompleteSupportFragment.setPlaceFields(Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS,
+        autocompleteSupportFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS,
                 Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.RATING, Place.Field.USER_RATINGS_TOTAL));
 
         autocompleteSupportFragment.setHint("Search Here...");
@@ -264,27 +299,38 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                     }
                     Log.i(TAG, "Place: " + place.getName());
                     place_name = place.getName();
+                    place_ID = place.getId();
                     b1.putString("destination", place_name);
+                    b1.putString("placeID", place_ID);
 
                     LatLng address = place.getLatLng();
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(4.0f));
                     Marker marker = null;
                     marker = mMap.addMarker(new MarkerOptions().position(address).title(place.getName())
                             .snippet("ADDRESS:  " + place.getAddress() + "\nRATING: " + place.getRating() + " (" + place.getUserRatingsTotal() + " )"
                                     + "\nCONTACT: " + place.getPhoneNumber() + "\nWEBSITE: " + place.getWebsiteUri()));
                     marker.hideInfoWindow();
                     MarkerPoints.add(1, address);
+
                     Log.i(TAG, "onPlaceSelected: " + MarkerPoints.get(1).toString());
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(address, 18);
-                    mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
-                        @Override
-                        public void onFinish() {
-                        }
+                    mMap.animateCamera(cameraUpdate);
 
-                        @Override
-                        public void onCancel() {
-                        }
-                    });
+//                    mMap.animateCamera(cameraUpdate, 1000, new GoogleMap.CancelableCallback() {
+//                        @Override
+//                        public void onFinish() {
+//                            Log.i(TAG, "onPlaceSelected: " +"NotQuit");
+//
+//                            if (handlerThread != null) {
+//                                handlerThread.quit();
+//                                Log.i(TAG, "onPlaceSelected: " + "QuitSafely");
+//
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCancel() {
+//                        }
+//                    });
                     mDirection.setVisibility(View.VISIBLE);
                 }
                 Log.i(TAG, "PlaceText: " + text);
@@ -313,15 +359,41 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
                 runOnUiThread(() -> {
                     Location address = locationResult.getLastLocation();
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    Log.d(TAG, "deviceCurrentLocation " + deviceCurrentLocation.toString()
+                            + "\n" + "New Location " + latLng.toString());
                     CurrentLocation_Lat = address.getLatitude();
                     CurrentLocation_Long = address.getLongitude();
 //                    Toast.makeText(Home.this,"Lat:- " +address.getLatitude()+"\n Long:- "+address.getLongitude(), LENGTH_LONG).show();
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    MarkerPoints.add(0, latLng);
-//                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
-//                    mMap.animateCamera(cameraUpdate);
+                    MarkerPoints.set(0, latLng);
+                    deviceLocationUpdate.setLocation(deviceCurrentLocation);
+                    Log.d(TAG, "deviceLocationUpdate From Home" + deviceLocationUpdate.getLocation().toString());
+                    Handler handler = new Handler();
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Latitude").setValue(CurrentLocation_Lat);
+                            mDataRef.child(user.getUid()).child("Location").child("lastLocation").child("Longitude").setValue(CurrentLocation_Long);
+                            Log.i("loc", "onLocationResult: Execute" + latLng);
 
-                    Log.i("loc", "onLocationResult: Execute" + latLng);
+                        }
+                    };
+                    handler.postDelayed(runnable, 7000);
+
+                    //FUTURE USE FOR AUTO sync...
+
+//                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
+//                    mMap.animateCamera(cameraUpdate, new GoogleMap.CancelableCallback() {
+//                        @Override
+//                        public void onFinish() {
+//
+//                        }
+//
+//                        @Override
+//                        public void onCancel() {
+//
+//                        }
+//                    });
 
                 });
 
@@ -393,7 +465,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     private void isCurrentLocation() {
 
         mDataRef.child(user.getUid()).child("Location").child("lastLocation")
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
 
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -403,7 +475,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                         MarkerPoints.add(0, new LatLng(CurrentLocation_Lat, CurrentLocation_Long));
                         Log.i(TAG, "onDataChange: Execute" + CurrentLocation_Lat + CurrentLocation_Long);
                         LatLng latLng = new LatLng(CurrentLocation_Lat, CurrentLocation_Long);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
                     }
 
                     @Override
@@ -420,6 +492,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         googlePlaceUrl.append("location=" + latitude + "," + longitude);
         googlePlaceUrl.append("&radius=" + 500);
         googlePlaceUrl.append("&keyword=" + nearbyPlace);
+        googlePlaceUrl.append("&type=" + type);
         googlePlaceUrl.append("&sensor=true");
         googlePlaceUrl.append("&key=" + apiKey_nearByPlace);
         Log.i(TAG, "url = " + googlePlaceUrl.toString());
@@ -431,16 +504,6 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
         if (isGPSEnabled()) {
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
             mLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
 
                 @Override
@@ -448,13 +511,22 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                     if (task.isSuccessful()) {
                         LocationUpdate();
                         Location address = task.getResult();
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(3.0f));
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
 //                        MarkerPoints.add(0, latLng);
-                        deviceCurrentLocation = address;
-
+                        deviceCurrentLocation = latLng;
+//
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
-                        mMap.animateCamera(cameraUpdate);
+                        mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
+                            @Override
+                            public void onFinish() {
+
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+                        });
 
                     } else {
                         Log.i("Task ", "onComplete: Not Execute");
@@ -483,7 +555,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                     })
                     .setNegativeButton("NO", (dialogInterface, i) -> {
                         LatLng latLng = new LatLng(CurrentLocation_Lat, CurrentLocation_Long);
-                        MarkerPoints.add(0, latLng);
+                        MarkerPoints.set(0, latLng);
                         Log.i(TAG, "onMapReady: " + CurrentLocation_Lat + CurrentLocation_Long);
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 19));
                     })
@@ -502,7 +574,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
             boolean providerEnable = Objects.requireNonNull(locationManager).isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (providerEnable) {
                 Toast.makeText(this, "GPS Enabled", LENGTH_LONG).show();
-                CameraUpdate cameraUpdate = CameraUpdateFactory.zoomTo(3);
+//                CameraUpdate cameraUpdate = CameraUpdateFactory.zoomTo(3);
 
             } else {
                 Toast.makeText(this, "GPS NOT Enabled", LENGTH_LONG).show();
@@ -527,9 +599,9 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         chipNavigationBar = findViewById(R.id.chip_navigation_bar);
         CardView_Place_Autocomplete_Fragment = findViewById(R.id.cardView_Search);
         horizontalScrollView = findViewById(R.id.scrollable_linearLayout);
+        headerImage =findViewById(R.id.header);
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -537,6 +609,17 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setBuildingsEnabled(true);
@@ -557,8 +640,9 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         }
         mMap.setInfoWindowAdapter(new CustomInfoWindow_Adapter(Home.this));
         LatLng latLng = new LatLng(CurrentLocation_Lat, CurrentLocation_Long);
+        deviceCurrentLocation = latLng;
         Log.i(TAG, "onMapReady: " + CurrentLocation_Lat + CurrentLocation_Long);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
         mMap.setOnPolylineClickListener(Home.this);
 
 //        mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
@@ -733,8 +817,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                 for (DirectionsRoute route : result.routes) {
                     Log.d(TAG, "run: leg: " + route.legs[0].toString());
                     Log.d(TAG, "run: leg: " + route.legs[0].distance);
-                    List<com.google.maps.model.LatLng> decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
-                    List<LatLng> newDecodedPath = new ArrayList<>();
+                    decodedPath = PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
+                    newDecodedPath = new ArrayList<>();
 
                     // This loops through all the LatLng coordinates of ONE polyline.
                     for (com.google.maps.model.LatLng latLng : decodedPath) {
@@ -768,10 +852,12 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                 polylineData.getPolyline().setColor(Color.RED);
                 polylineData.getPolyline().setZIndex(1);
 
-                Duration duration = polylineData.getLeg().duration;
-                Distance distance = polylineData.getLeg().distance;
-                b2.putString("duration", duration.toString());
-                b2.putString("distance", distance.toString());
+                String duration = polylineData.getLeg().duration.humanReadable;
+                String distance = polylineData.getLeg().distance.humanReadable;
+                Log.d("Duration& Distance", duration + distance);
+
+                b2.putString("duration", duration);
+                b2.putString("distance", distance);
 
                 newFragment = 1;
 
@@ -806,8 +892,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
     private void LocationUpdate() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(2000);
-        locationRequest.setFastestInterval(1000);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2000);
 
         handlerThread = new HandlerThread("LocationCallbackHandler");
         handlerThread.start();
@@ -817,8 +903,8 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
     public void onClick(View v) {
         Object[] dataTransfer = new Object[2];
-        GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData(mContext);
-        GetNearbyPlacesDataog getNearbyPlacesDataog = new GetNearbyPlacesDataog(mContext);
+        GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData(getApplicationContext());
+        GetNearbyPlacesDataog getNearbyPlacesDataog = new GetNearbyPlacesDataog(getApplicationContext());
 
         switch (v.getId()) {
             case R.id.restaurant: {
@@ -830,7 +916,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(Home.this, "Showing Nearby Restaurants", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Home.this, "Showing Nearby Restaurants", LENGTH_LONG).show();
                 break;
             }
             case R.id.school: {
@@ -842,19 +928,19 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(Home.this, "Showing Nearby Schools", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Home.this, "Showing Nearby Schools", Toast.LENGTH_LONG).show();
                 break;
             }
             case R.id.atm: {
                 mMap.clear();
-                String search = "atm";
-                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search, null);
+                String search = "Atm";
+                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search, search);
 
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(Home.this, "Showing Nearby Atms", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Home.this, "Showing Nearby Atms", Toast.LENGTH_LONG).show();
                 break;
             }
             case R.id.hotel: {
@@ -866,8 +952,20 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(Home.this, "Showing Nearby Hotels", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Home.this, "Showing Nearby Hotels", Toast.LENGTH_LONG).show();
 
+                break;
+            }
+            case R.id.park: {
+                mMap.clear();
+                String search = "Park";
+                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search, null);
+
+                dataTransfer[0] = mMap;
+                dataTransfer[1] = url;
+
+                getNearbyPlacesData.execute(dataTransfer);
+                Toast.makeText(Home.this, "Showing Nearby Parks", Toast.LENGTH_LONG).show();
                 break;
             }
         }
@@ -878,7 +976,9 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         CardView_Place_Autocomplete_Fragment.setVisibility(View.VISIBLE);
         horizontalScrollView.setVisibility(View.VISIBLE);
         navigationView.setVisibility(View.VISIBLE);
-        mCurrentLocation.setVisibility(View.VISIBLE);
+        mCurrentLocation.animate()
+                .translationY(-mCurrentLocation.getHeight()+85)
+                .translationX(mCurrentLocation.getWidth()-165);
     }
 
     private void hideBackground() {
@@ -886,8 +986,10 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         CardView_Place_Autocomplete_Fragment.setVisibility(View.INVISIBLE);
         horizontalScrollView.setVisibility(View.INVISIBLE);
         mDirection.setVisibility(View.INVISIBLE);
+        mCurrentLocation.animate()
+                .translationY(-mCurrentLocation.getHeight() - 75)
+                .translationX(mCurrentLocation.getWidth() - 20);
         navigationView.setVisibility(View.INVISIBLE);
-        mCurrentLocation.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -899,25 +1001,11 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         }
     }
 
-    public void closeFragment() {
+    public void closeFragment(String place_ID, String isFromFragment) {
 
         mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(destination).visible(false));
-        b1.putString("destination", place_name);
+        directionCallByPOI(place_ID, isFromFragment);
 
-        LatLng address = destination;
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(3.0f));
-
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(address, 18);
-        mMap.animateCamera(cameraUpdate, 1500, new GoogleMap.CancelableCallback() {
-            @Override
-            public void onFinish() {
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
         transaction = manager.beginTransaction();
         Fragment f1 = manager.findFragmentById(R.id.fragment_TOP);
         Fragment f2 = manager.findFragmentById(R.id.fragment_BOTTOM);
@@ -927,14 +1015,10 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         transaction.remove(f2);
         transaction.commit();
         showBackground();
-    }
-
-    private void location(double Lang, double Long) {
-
-        LatLng latLng = new LatLng(Lang, Long);
-        showMarker(latLng);
+        mDirection.setVisibility(View.VISIBLE);
 
     }
+
 
     private void showMarker(LatLng latLng) {
         MarkerOptions markerOptions = new MarkerOptions();
@@ -944,20 +1028,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
     }
 
-    public void addList(ArrayList arrayList_Lat, ArrayList arrayList_Long) {
-
-        list_Lat = (ArrayList) arrayList_Lat.clone();
-        this.list_Long = (ArrayList) arrayList_Long.clone();
-
-        double v1 = (double) list_Lat.get(5);
-        double v2 = (double) list_Long.get(5);
-        LatLng latlang = new LatLng(v1, v2);
-//            showMarker(latlang);
-        Log.i(TAG, "addList Print: " + list_Lat.get(5) + " " + list_Long.get(5) + latlang);
-//        location(v1,v2);
-    }
-
-    public void directionCallByPOI(String destinationID) {
+    public void directionCallByPOI(String destinationID, String fromWhich) {
 
         Log.i(TAG, "directionCallByPOI: " + destinationID);
         String placeId = destinationID;
@@ -978,14 +1049,17 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
                     .snippet("ADDRESS:  " + place.getAddress() + "\nRATING: " + place.getRating() + " (" + place.getUserRatingsTotal() + " )"
                             + "\nCONTACT: " + place.getPhoneNumber() + "\nWEBSITE: " + place.getWebsiteUri()));
             marker.hideInfoWindow();
-            direction(mDirection);
-
+            if (fromWhich.equals("New_Place")) {
+                Log.d(TAG, "Home" + fetchPlaceList.getPlaceList());
+                direction(mDirection);
+            } else {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 18));
+            }
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
                 ApiException apiException = (ApiException) exception;
-                String errorMessage = apiException.getMessage();
-                Log.e(TAG, "Place not found: " + exception.getMessage());
+                Log.e(TAG, "Place not found: " + apiException.getMessage());
             }
         });
 //        MarkerPoints = new ArrayList<>(2);
@@ -1043,6 +1117,7 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
         source = "My Location";
         b1.putString("source", source);
+        Log.i(TAG, "placeID: " + b1.getString("placeID"));
         Log.i(TAG, "direction: " + b1.getString("destination") + b2.getString("duration") +
                 b2.getString("distance") + b2.getDouble("Lat_source"));
         transaction = manager.beginTransaction();
@@ -1056,18 +1131,19 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         bottomFragment.setArguments(b2);
         hideBackground();
         transaction.commit();
-        LatLngBounds.Builder bounds = new LatLngBounds.Builder();
+        double topBounds = origin.latitude + 0.004;
+        double rightBounds = origin.longitude + 0.004;
+        double bottomBounds = destination.latitude - 0.004;
+        double leftBounds = destination.longitude - 0.004;
 
-        bounds.include(origin);
-        bounds.include(destination);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 50));
+        LatLngBounds bounds = new LatLngBounds(new LatLng(bottomBounds, leftBounds), new LatLng(topBounds, rightBounds));
 
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 1));
 
 
     }
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context applicationContext) {
-//        Drawable vectorDrawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_hospital);
         Drawable vectorDrawable = applicationContext.getResources().getDrawable(R.drawable.ic_school);
         Objects.requireNonNull(vectorDrawable).setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -1138,13 +1214,11 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
             case R.id.add_new_place:
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(new Intent(Home.this, New_Place.class));
-                finish();
                 break;
 
             case R.id.favorite_place:
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(new Intent(Home.this, POI_Set.class));
-                finish();
                 break;
         }
         return true;

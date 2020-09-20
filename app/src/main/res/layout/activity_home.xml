@@ -9,8 +9,6 @@
     android:fitsSystemWindows="false"
     tools:context=".Home">
 
-
-
         <!--    <SearchView-->
         <!--        android:id="@+id/search_View"-->
         <!--        android:layout_width="0dp"-->
@@ -43,7 +41,7 @@
                 android:layout_above="@id/chip_navigation_bar"
                 app:layout_constraintBottom_toTopOf="@+id/chip_navigation_bar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -236,7 +234,7 @@
                         tools:ignore="HardcodedText" />
 
                     <Button
-                        android:id="@+id/Hospital"
+                        android:id="@+id/park"
                         style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="match_parent"
                         android:layout_height="35dp"

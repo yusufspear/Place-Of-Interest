@@ -109,7 +109,7 @@ public class POI_Set extends AppCompatActivity {
         if (mDataRef.child(user.getUid()).child("Delete POI List") != null) {
 
 
-            mDataRef.child(user.getUid()).child("Delete POI List").child("index").addValueEventListener(new ValueEventListener() {
+            mDataRef.child(user.getUid()).child("Delete POI List").child("index").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     List<Integer> list = new ArrayList();
@@ -220,14 +220,14 @@ public class POI_Set extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        if (){
+        startActivity(new Intent(this, Home.class));
 
-//        }
     }
 
     @Override
@@ -248,6 +248,7 @@ public class POI_Set extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mDataRef.child(user.getUid()).child("Delete POI List").removeValue();
+
 
     }
 }

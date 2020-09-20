@@ -24,6 +24,7 @@ import java.util.List;
 
 import static com.example.placeofinterest.R.id.add;
 import static com.example.placeofinterest.R.id.chip_history;
+import static com.example.placeofinterest.R.id.chip_profile;
 
 public class History extends AppCompatActivity {
     ChipNavigationBar chipNavigationBar;
@@ -31,7 +32,7 @@ public class History extends AppCompatActivity {
     historyAdapter historyAdapter;
     private List<String> destTitle = new ArrayList<>();
     private List<URL> destUrl = new ArrayList<>();
-    private List<Time> searchTime = new ArrayList<>();
+    private List<String> searchTime = new ArrayList<>();
     private List<String> destPoiType = new ArrayList<>();
     private List<Float> ratingValue = new ArrayList<>();
 
@@ -43,11 +44,17 @@ public class History extends AppCompatActivity {
         setContentView(R.layout.activity_history);
         initViews();
 
-        destTitle.add("Kurla");
-        destUrl.add(null);
-        destPoiType.add("Gym");
-        ratingValue.add(4.0f);
-        searchTime.add(null);
+        destTitle.add(0,"Kalina University");
+        destUrl.add(0,null);
+        destPoiType.add(0,"Restaurant");
+        ratingValue.add(0,4.0f);
+        searchTime.add(0,"5:29 PM");
+
+        destTitle.add(1,"New Panvel");
+        destUrl.add(1,null);
+        destPoiType.add(1,"Park");
+        ratingValue.add(1,4.5f);
+        searchTime.add(1,"12:00 PM");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         historyAdapter = new historyAdapter(destTitle,destUrl,searchTime,destPoiType,ratingValue);
         recyclerView.setAdapter(historyAdapter);
@@ -65,46 +72,20 @@ public class History extends AppCompatActivity {
                     case R.id.chip_profile:
                         startActivity(new Intent(History.this, Profile.class));
                         overridePendingTransition(0,0);
+                        finish();
                         break;
 
                     case R.id.chip_home:
                         startActivity(new Intent(History.this, Home.class));
                         overridePendingTransition(0,0);
+                        finish();
+
                         break;
 
                 }
 
             }
         });
-
-//        bottomNavigationView.setSelectedItemId(R.id.history);
-//
-//        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-//                switch (menuItem.getItemId()){
-//
-//                    case R.id.history:
-//                        return true;
-//
-//                    case R.id.home:
-//                        startActivity(new Intent(History.this, Home.class));
-//                        overridePendingTransition(0,0);
-//                        return true;
-//
-//                    case R.id.search:
-//                        startActivity(new Intent(History.this, Search.class));
-//                        overridePendingTransition(0,0);
-//                        return true;
-//
-//                    case R.id.profile:
-//                        startActivity(new Intent(History.this, Profile.class));
-//                        overridePendingTransition(0,0);
-//                        return true;
-//                }
-//                return false;
-//            }
-//        });
 
 
 
@@ -153,6 +134,11 @@ public class History extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView_History);
 
 
+
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
 
     }
 

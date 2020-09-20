@@ -131,12 +131,6 @@ public class Select_POI extends AppCompatActivity {
             Toast.makeText(this, "Select At least 3", Toast.LENGTH_LONG).show();
         }
 
-
-
-
-
-
-
     }
 
     private void RestaurantClick(View view) {
