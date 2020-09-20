@@ -67,22 +67,32 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
             String rating = googlePlace.get("rating");
             float ret= Float.parseFloat(rating);
             String user_ratings_total = googlePlace.get("user_ratings_total");
-            if (ret>=3.0){
+//            if (ret>=3.0){
+//
+//                String placeName = googlePlace.get("place_name");
+//                String vicinity = googlePlace.get("vicinity");
+//                double lat = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lat")));
+//                double lng = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lng")));
+//
+//                latLng = new LatLng(lat, lng);
+//
+//                mMap.addMarker(new MarkerOptions().position(latLng).title(placeName)
+//                        .snippet("ADDRESS : " + vicinity + "\nRATING : " + rating + " (" + user_ratings_total + ")"));
+//
+//                Log.i(TAG, "showNearbyPlaces: " + i + nearbyPlaceList);
+//
+//            }
+            String placeName = googlePlace.get("place_name");
+            String vicinity = googlePlace.get("vicinity");
+            double lat = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lat")));
+            double lng = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lng")));
 
-                String placeName = googlePlace.get("place_name");
-                String vicinity = googlePlace.get("vicinity");
-                double lat = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lat")));
-                double lng = Double.parseDouble(Objects.requireNonNull(googlePlace.get("lng")));
+            latLng = new LatLng(lat, lng);
 
-                latLng = new LatLng(lat, lng);
+            mMap.addMarker(new MarkerOptions().position(latLng).title(placeName)
+                    .snippet("ADDRESS : " + vicinity + "\nRATING : " + rating + " (" + user_ratings_total + ")"));
 
-                mMap.addMarker(new MarkerOptions().position(latLng).title(placeName)
-                        .snippet("ADDRESS : " + vicinity + "\nRATING : " + rating + " (" + user_ratings_total + ")"));
-
-                Log.i(TAG, "showNearbyPlaces: " + i + nearbyPlaceList);
-
-            }
-
+            Log.i(TAG, "showNearbyPlaces: " + i + nearbyPlaceList);
         }
         for(int i = 0; i < nearbyPlaceList.size(); i++)
         Log.i(TAG, "showNearbyPlaces: List Print"+list_Lat+" "+list_Long);

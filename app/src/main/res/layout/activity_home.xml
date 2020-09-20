@@ -243,7 +243,21 @@
                         android:layout_marginRight="5dp"
                         android:background="@drawable/nearbyplace_background"
                         android:onClick="onClick"
-                        android:text="School"
+                        android:text="Park"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="12sp"
+                        tools:ignore="HardcodedText" />
+                    <Button
+                        android:id="@+id/petrol"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/nearbyplace_background"
+                        android:onClick="onClick"
+                        android:text="Petrol"
                         android:textColor="@color/colorBlack"
                         android:textSize="12sp"
                         tools:ignore="HardcodedText" />

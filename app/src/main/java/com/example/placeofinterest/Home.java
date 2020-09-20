@@ -224,14 +224,15 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
         MarkerPoints = new ArrayList<>(2);
         initViews();
 
-        mStorageRef.getBytes(1024*1024).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap bitmap=BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                Log.d("Download Image","1");
-                headerImage.setImageBitmap(bitmap);
-            }
-        });
+//        mStorageRef.getBytes(1024*1024).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+//            @Override
+//            public void onSuccess(byte[] bytes) {
+//                Bitmap bitmap=BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+//                Log.d("Download Image","1");
+//                headerImage.setImageBitmap(bitmap);
+//            }
+//        });
+
         apiKey = getString(R.string.google_maps_key);
         apiKey_nearByPlace = getString(R.string.browser_key);
         if (mGeoApiContext == null) {
@@ -966,6 +967,18 @@ public class Home extends AppCompatActivity implements OnMapReadyCallback, OnPol
 
                 getNearbyPlacesData.execute(dataTransfer);
                 Toast.makeText(Home.this, "Showing Nearby Parks", Toast.LENGTH_LONG).show();
+                break;
+            }
+            case R.id.petrol: {
+                mMap.clear();
+                String search = "Petrol";
+                String url = getUrl(CurrentLocation_Lat, CurrentLocation_Long, search, null);
+
+                dataTransfer[0] = mMap;
+                dataTransfer[1] = url;
+
+                getNearbyPlacesData.execute(dataTransfer);
+                Toast.makeText(Home.this, "Showing Nearby Petrol Station", Toast.LENGTH_LONG).show();
                 break;
             }
         }
